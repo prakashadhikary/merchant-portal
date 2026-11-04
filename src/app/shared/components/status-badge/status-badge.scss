@@ -1,0 +1,27 @@
+.mp-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.2rem 0.625rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+
+.mp-status-dot {
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+@each $tone in secondary, primary, warning, success, danger {
+  .mp-status-#{$tone} {
+    background: var(--bs-#{$tone}-bg-subtle);
+    color: var(--bs-#{$tone}-text-emphasis);
+    border-color: var(--bs-#{$tone}-border-subtle);
+  }
+}

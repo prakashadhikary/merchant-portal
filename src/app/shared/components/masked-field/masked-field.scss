@@ -1,0 +1,15 @@
+.mp-mask {
+  font-family: var(--bs-font-monospace);
+  font-size: 0.875rem;
+  letter-spacing: 0.06em;
+  color: var(--bs-body-color);
+  background: var(--bs-tertiary-bg);
+  border: 1px solid var(--bs-border-color);
+  border-radius: var(--bs-border-radius-sm);
+  padding: 0.125rem 0.5rem;
+}
+
+.mp-mask-revealed {
+  background: var(--bs-warning-bg-subtle);
+  border-color: var(--bs-warning-border-subtle);
+}

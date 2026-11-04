@@ -1,0 +1,29 @@
+<div class="mp-field-label">{{ label() }}</div>
+<div class="d-flex align-items-center gap-2 flex-wrap">
+  <code class="mp-mask" [class.mp-mask-revealed]="value() !== null">{{ value() ?? masked() }}</code>
+  @if (canReveal()) {
+    @if (value() === null) {
+      <button
+        type="button"
+        class="btn btn-link btn-sm p-0"
+        [disabled]="busy()"
+        [attr.aria-label]="'Reveal ' + label()"
+        (click)="reveal.emit()"
+      >
+        <mp-icon name="eye" [size]="14" />
+        Reveal
+      </button>
+    } @else {
+      <button
+        type="button"
+        class="btn btn-link btn-sm p-0"
+        [attr.aria-label]="'Hide ' + label()"
+        (click)="hide.emit()"
+      >
+        <mp-icon name="eye-off" [size]="14" />
+        Hide
+      </button>
+      <span class="small text-secondary">re-masks in {{ revealSeconds() }} s</span>
+    }
+  }
+</div>
