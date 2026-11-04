@@ -1,0 +1,13 @@
+.nav-link {
+  font-weight: 500;
+  color: var(--bs-secondary-color);
+
+  &.active {
+    color: var(--bs-primary);
+  }
+}
+
+.mp-role {
+  font-size: 0.75rem;
+  color: var(--bs-secondary-color);
+}

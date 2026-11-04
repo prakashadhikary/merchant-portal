@@ -1,0 +1,44 @@
+<nav class="navbar navbar-expand bg-white border-bottom sticky-top" aria-label="Main">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center gap-2 me-sm-4" routerLink="/applications">
+      <span class="mp-brand-mark" aria-hidden="true"><mp-icon name="check" [size]="16" /></span>
+      <span class="fw-semibold">Merchant Portal</span>
+    </a>
+    <div class="navbar-nav me-auto d-none d-sm-flex">
+      <a class="nav-link" routerLink="/applications" routerLinkActive="active">Applications</a>
+    </div>
+    @if (auth.user(); as user) {
+      <div class="d-flex align-items-center gap-2 ms-auto me-2 me-sm-3">
+        <mp-avatar [name]="user.name" size="sm" />
+        <span class="d-none d-md-block lh-sm">
+          <span class="d-block small fw-medium">{{ user.name }}</span>
+          <span class="d-block mp-role">{{ roleLabels[user.role] }}</span>
+        </span>
+      </div>
+    }
+    @if (devMode) {
+      <button
+        type="button"
+        class="btn btn-outline-warning btn-sm me-2"
+        title="Dev only: make the next request fail with 401 to watch the refresh flow"
+        aria-label="Expire token"
+        (click)="auth.expireAccessToken()"
+      >
+        <mp-icon name="clock" [size]="14" />
+        <span class="d-none d-md-inline">Expire token</span>
+      </button>
+    }
+    <button
+      type="button"
+      class="btn btn-light btn-sm border"
+      aria-label="Sign out"
+      (click)="signOut()"
+    >
+      <mp-icon name="log-out" [size]="14" />
+      <span class="d-none d-sm-inline">Sign out</span>
+    </button>
+  </div>
+</nav>
+<main id="main" class="container py-4">
+  <router-outlet />
+</main>
