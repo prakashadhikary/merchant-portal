@@ -140,8 +140,8 @@ toLoadable() → toSignal`), so a newer request always cancels an older one.
   as a keyboard-friendly fallback. Rows are a CSS grid of fixed height, which
   the fixed-size scroll strategy relies on.
 - **Typed Reactive Forms.** The application form is one `FormGroup` with typed
-  sub-groups built in `application-form.ts`. Validators are pure functions with
-  their own spec.
+  sub-groups built in `application-form.helper.ts`. Validators are pure
+  functions with their own spec.
 - **Auto-save** (`ApplicationFormStore`): `business/contacts valueChanges →
 filter(dirty) → mark dirty → debounceTime(1000) → skip if equal to the last
 saved payload → switchMap(PUT)`, with `catchError` inside the inner observable
