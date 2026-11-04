@@ -1,0 +1,88 @@
+<main class="mp-login-shell">
+  <div class="mp-login">
+    <div class="d-flex align-items-center justify-content-center gap-2 mb-4">
+      <span class="mp-brand-mark" aria-hidden="true"><mp-icon name="check" [size]="16" /></span>
+      <span class="fs-5 fw-semibold">Merchant Portal</span>
+    </div>
+
+    <div class="mp-card p-4 p-sm-5">
+      <h1 class="h4 mb-1">Sign in</h1>
+      <p class="text-secondary mb-4">
+        Pick a demo account. No passwords are used anywhere in this app.
+      </p>
+
+      @if (error(); as message) {
+        <div class="alert alert-danger" role="alert">{{ message }}</div>
+      }
+      @if (notice(); as message) {
+        <div class="alert alert-info" role="status">{{ message }}</div>
+      }
+
+      <div class="d-grid gap-2 mb-4">
+        @for (user of demoUsers; track user.id) {
+          <button
+            type="button"
+            class="mp-persona"
+            [attr.aria-label]="'Sign in as ' + user.name"
+            [disabled]="busy()"
+            (click)="signIn(user.email)"
+          >
+            <mp-avatar [name]="user.name" />
+            <span class="mp-persona-text">
+              <span class="mp-persona-name">{{ user.name }}</span>
+              <span class="mp-persona-role">
+                {{ roleLabels[user.role] }} · {{ roleDescriptions[user.role] }}
+              </span>
+            </span>
+            <mp-icon name="arrow-right" [size]="16" />
+          </button>
+        }
+      </div>
+
+      <div class="mp-divider mb-3"><span>or use a seeded email</span></div>
+
+      <form (submit)="$event.preventDefault(); signInWithEmail()" novalidate>
+        <label class="visually-hidden" for="email">Email</label>
+        <div class="input-group">
+          <input
+            id="email"
+            type="email"
+            class="form-control"
+            placeholder="name@example.com"
+            autocomplete="username"
+            [formControl]="email"
+            [class.is-invalid]="email.touched && email.invalid"
+          />
+          <button type="submit" class="btn btn-primary" [disabled]="busy()">Sign in</button>
+        </div>
+        @if (email.touched && email.invalid) {
+          <div class="invalid-feedback d-block">Enter a valid email address.</div>
+        }
+      </form>
+    </div>
+
+    <div class="mp-card p-3 mt-4 small">
+      <div class="d-flex flex-wrap align-items-center gap-2">
+        <label class="text-secondary mb-0" for="seed-size">Demo data</label>
+        <select
+          #sizeSelect
+          id="seed-size"
+          class="form-select form-select-sm w-auto"
+          [value]="seedSize()"
+          (change)="setSeedSize(sizeSelect.value)"
+        >
+          @for (size of seedSizes; track size) {
+            <option [value]="size">{{ size | number }} applications</option>
+          }
+        </select>
+        <button type="button" class="btn btn-outline-secondary btn-sm" (click)="resetDemoData()">
+          Reset demo data
+        </button>
+      </div>
+      <p class="text-secondary mb-0 mt-2">
+        Generated in this browser; nothing is real. The large sets exceed browser storage, so their
+        edits last for the session only.
+      </p>
+    </div>
+  </div>
+</main>

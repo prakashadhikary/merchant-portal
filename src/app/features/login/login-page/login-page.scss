@@ -1,0 +1,81 @@
+.mp-login-shell {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  background:
+    radial-gradient(60rem 28rem at 50% -8rem, #e0e7ff 0%, rgba(224, 231, 255, 0) 70%),
+    var(--bs-body-bg);
+}
+
+.mp-login {
+  width: 100%;
+  max-width: 28rem;
+}
+
+.mp-persona {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  text-align: left;
+  background: #fff;
+  border: 1px solid var(--bs-border-color);
+  border-radius: var(--bs-border-radius);
+  color: var(--bs-body-color);
+  transition:
+    border-color 0.15s,
+    background-color 0.15s;
+
+  mp-icon {
+    margin-left: auto;
+    color: var(--bs-secondary-color);
+  }
+
+  &:hover:not(:disabled) {
+    border-color: var(--bs-primary);
+    background: #f8faff;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--bs-primary);
+    outline-offset: 2px;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+  }
+}
+
+.mp-persona-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.mp-persona-name {
+  font-weight: 600;
+}
+
+.mp-persona-role {
+  font-size: 0.8125rem;
+  color: var(--bs-secondary-color);
+}
+
+.mp-divider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.8125rem;
+  color: var(--bs-secondary-color);
+
+  &::before,
+  &::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--bs-border-color);
+  }
+}
