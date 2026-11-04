@@ -1,0 +1,90 @@
+.mp-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--bs-border-color);
+}
+
+.mp-search {
+  position: relative;
+  flex: 1 1 16rem;
+  max-width: 24rem;
+
+  .form-control {
+    padding-left: 2.25rem;
+  }
+}
+
+.mp-search-icon {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--bs-secondary-color);
+  pointer-events: none;
+}
+
+// Virtualized list: a CSS grid per row so the header and the rows share one
+// column template, and every row is exactly $row-height tall.
+$row-height: 64px;
+$columns: minmax(11rem, 2fr) 8.5rem minmax(8rem, 1fr) minmax(9rem, 1.2fr) 6.5rem 5.5rem;
+$columns-admin: minmax(11rem, 2fr) 8.5rem minmax(8rem, 1fr) minmax(9rem, 1.2fr) minmax(8rem, 1fr)
+  6.5rem 5.5rem;
+
+.mp-grid-row {
+  display: grid;
+  grid-template-columns: $columns;
+  align-items: center;
+  column-gap: 1rem;
+  height: $row-height;
+  padding: 0 1.25rem;
+  border-bottom: 1px solid var(--bs-border-color);
+
+  > [role='cell'] {
+    min-width: 0;
+    white-space: nowrap;
+  }
+
+  &:hover {
+    background: var(--bs-tertiary-bg);
+  }
+}
+
+.mp-grid-admin .mp-grid-row {
+  grid-template-columns: $columns-admin;
+}
+
+.mp-grid-row-head {
+  height: 2.75rem;
+  background: var(--bs-tertiary-bg);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--bs-secondary-color);
+
+  &:hover {
+    background: var(--bs-tertiary-bg);
+  }
+}
+
+.mp-grid-viewport {
+  height: clamp(320px, 60vh, 640px);
+}
+
+@media (max-width: 767.98px) {
+  .mp-grid-row,
+  .mp-grid-admin .mp-grid-row {
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    padding: 0 1rem;
+  }
+
+  .mp-col-volume,
+  .mp-col-reviewer,
+  .mp-col-creator,
+  .mp-col-updated {
+    display: none;
+  }
+}

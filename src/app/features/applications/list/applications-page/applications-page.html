@@ -1,0 +1,205 @@
+<header class="mp-page-header">
+  <div>
+    <h1 class="mp-page-title">Applications</h1>
+    <p class="mp-page-subtitle">{{ subtitle() }}</p>
+  </div>
+  @if (auth.hasRole('SALES')) {
+    <button type="button" class="btn btn-primary" [disabled]="creating()" (click)="createDraft()">
+      <mp-icon name="plus" [size]="16" />
+      New application
+    </button>
+  }
+</header>
+
+@if (createError(); as message) {
+  <div class="alert alert-danger" role="alert">{{ message }}</div>
+}
+
+<section class="mp-card">
+  <form class="mp-toolbar" (submit)="$event.preventDefault()">
+    <div class="mp-search">
+      <label class="visually-hidden" for="search">Search by business name</label>
+      <mp-icon class="mp-search-icon" name="search" [size]="16" />
+      <input
+        #searchInput
+        id="search"
+        type="search"
+        class="form-control"
+        placeholder="Search by business name"
+        [value]="store.filters().q"
+        (input)="search(searchInput.value)"
+      />
+    </div>
+    <div>
+      <label class="visually-hidden" for="status">Status</label>
+      <select
+        #statusSelect
+        id="status"
+        class="form-select"
+        [value]="store.filters().status"
+        (change)="setStatus(statusSelect.value)"
+      >
+        <option value="">All statuses</option>
+        @for (status of statuses; track status) {
+          <option [value]="status">{{ statusLabels[status] }}</option>
+        }
+      </select>
+    </div>
+    @if (store.hasFilters()) {
+      <button type="button" class="btn btn-link btn-sm" (click)="clearFilters()">
+        Clear filters
+      </button>
+    }
+  </form>
+
+  @let state = store.state();
+  @if (state.total === null) {
+    @if (state.error; as message) {
+      <div class="p-3">
+        <div
+          class="alert alert-danger d-flex justify-content-between align-items-center mb-0"
+          role="alert"
+        >
+          <span>
+            <mp-icon name="alert" [size]="16" />
+            Couldn't load applications: {{ message }}
+          </span>
+          <button type="button" class="btn btn-outline-danger btn-sm" (click)="store.loadMore()">
+            <mp-icon name="refresh" [size]="14" />
+            Retry
+          </button>
+        </div>
+      </div>
+    } @else {
+      <div class="px-3" aria-busy="true">
+        @for (row of skeletonRows; track row) {
+          <div class="placeholder-glow py-3 border-bottom">
+            <span class="placeholder col-3 me-3"></span>
+            <span class="placeholder col-2 me-3"></span>
+            <span class="placeholder col-2 me-3"></span>
+            <span class="placeholder col-1"></span>
+          </div>
+        }
+      </div>
+    }
+  } @else if (state.total === 0) {
+    <div class="mp-empty">
+      <div class="mp-empty-icon"><mp-icon name="inbox" [size]="24" /></div>
+      @if (store.hasFilters()) {
+        <p class="mp-empty-title">No applications match these filters</p>
+        <p class="mb-3">Try another business name or status.</p>
+        <button type="button" class="btn btn-outline-secondary btn-sm" (click)="clearFilters()">
+          Clear filters
+        </button>
+      } @else {
+        <p class="mp-empty-title">{{ emptyMessage() }}</p>
+        @if (auth.hasRole('SALES')) {
+          <p class="mb-3">Start a merchant application; it is saved as you type.</p>
+          <button type="button" class="btn btn-primary btn-sm" (click)="createDraft()">
+            New application
+          </button>
+        }
+      }
+    </div>
+  } @else {
+    <div
+      class="mp-grid"
+      role="table"
+      aria-label="Merchant applications"
+      [attr.aria-rowcount]="state.total"
+      [class.mp-grid-admin]="isAdmin()"
+    >
+      <div class="mp-grid-head" role="rowgroup">
+        <div class="mp-grid-row mp-grid-row-head" role="row">
+          <span role="columnheader">Business</span>
+          <span role="columnheader" class="mp-col-status">Status</span>
+          <span role="columnheader" class="mp-col-volume text-end">Monthly volume</span>
+          <span role="columnheader" class="mp-col-reviewer">Reviewer</span>
+          @if (isAdmin()) {
+            <span role="columnheader" class="mp-col-creator">Created by</span>
+          }
+          <span role="columnheader" class="mp-col-updated">Updated</span>
+          <span role="columnheader" class="mp-col-action">
+            <span class="visually-hidden">Action</span>
+          </span>
+        </div>
+      </div>
+      <!-- Only the rows in and around the viewport exist in the DOM, whatever the list length. -->
+      <cdk-virtual-scroll-viewport
+        class="mp-grid-viewport"
+        role="rowgroup"
+        [itemSize]="rowHeight"
+        [minBufferPx]="rowHeight * 4"
+        [maxBufferPx]="rowHeight * 8"
+        (scrolledIndexChange)="onScrolled()"
+      >
+        <div
+          class="mp-grid-row"
+          role="row"
+          *cdkVirtualFor="let app of state.items; trackBy: trackById; let i = index"
+          [attr.aria-rowindex]="i + 1"
+        >
+          <span role="cell" class="mp-col-business">
+            <span class="d-block fw-medium text-truncate">
+              {{ app.business.legalName || 'Untitled draft' }}
+            </span>
+            <span class="d-block small text-secondary">{{ app.id }}</span>
+          </span>
+          <span role="cell" class="mp-col-status"><mp-status-badge [status]="app.status" /></span>
+          <span role="cell" class="mp-col-volume text-end mp-tabular">
+            @if (app.contacts.expectedMonthlyVolume; as volume) {
+              NPR {{ volume | number: '1.0-0' }}
+            } @else {
+              <span class="text-secondary">-</span>
+            }
+          </span>
+          <span role="cell" class="mp-col-reviewer">
+            @if (app.assignedReviewer; as reviewer) {
+              <span class="d-inline-flex align-items-center gap-2 mw-100">
+                <mp-avatar [name]="reviewer.name" size="sm" />
+                <span class="text-truncate">{{ reviewer.name }}</span>
+              </span>
+            } @else {
+              <span class="text-secondary">—</span>
+            }
+          </span>
+          @if (isAdmin()) {
+            <span role="cell" class="mp-col-creator text-truncate">{{ app.createdBy.name }}</span>
+          }
+          <span role="cell" class="mp-col-updated text-secondary">
+            <span [title]="app.updatedAt | date: 'medium'">{{ app.updatedAt | relativeTime }}</span>
+          </span>
+          <span role="cell" class="mp-col-action text-end">
+            @let action = actionFor(app);
+            <a class="btn btn-sm btn-outline-primary" [routerLink]="action.link">
+              {{ action.label }}
+            </a>
+          </span>
+        </div>
+      </cdk-virtual-scroll-viewport>
+    </div>
+    <div class="mp-card-footer" aria-live="polite">
+      <span class="text-secondary small"
+        >Showing {{ state.items.length | number }} of {{ state.total | number }}</span
+      >
+      <span class="ms-auto small d-inline-flex align-items-center gap-2">
+        @if (state.error; as message) {
+          <span class="text-danger">Couldn't load more: {{ message }}</span>
+          <button type="button" class="btn btn-outline-danger btn-sm" (click)="store.loadMore()">
+            <mp-icon name="refresh" [size]="14" />
+            Retry
+          </button>
+        } @else if (state.loading) {
+          <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+          <span class="text-secondary">Loading more…</span>
+        } @else if (store.hasMore()) {
+          <button type="button" class="btn btn-link btn-sm p-0" (click)="store.loadMore()">
+            Load more
+          </button>
+        } @else {
+          <span class="text-secondary">All applications loaded</span>
+        }
+      </span>
+    </div>
+  }
+</section>
