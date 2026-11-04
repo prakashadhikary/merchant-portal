@@ -1,0 +1,51 @@
+.mp-timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.mp-timeline-item {
+  position: relative;
+  padding-left: 1.5rem;
+  padding-bottom: 1rem;
+  font-size: 0.875rem;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0.3125rem;
+    top: 1rem;
+    bottom: -0.25rem;
+    width: 2px;
+    background: var(--bs-border-color);
+  }
+
+  &:last-child {
+    padding-bottom: 0;
+
+    &::before {
+      display: none;
+    }
+  }
+}
+
+.mp-timeline-text {
+  font-weight: 500;
+}
+
+.mp-timeline-dot {
+  position: absolute;
+  left: 0;
+  top: 0.3rem;
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 50%;
+  background: var(--bs-secondary);
+  box-shadow: 0 0 0 3px #fff;
+}
+
+@each $tone in primary, warning, success, danger {
+  .tone-#{$tone} .mp-timeline-dot {
+    background: var(--bs-#{$tone});
+  }
+}

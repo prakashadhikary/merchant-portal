@@ -1,0 +1,167 @@
+@let view = application();
+@switch (view.status) {
+  @case ('loading') {
+    <p class="text-secondary" aria-busy="true">
+      <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
+      Loading application…
+    </p>
+  }
+  @case ('error') {
+    <div class="alert alert-danger d-flex justify-content-between align-items-center" role="alert">
+      <span>{{ view.message }}</span>
+      <button type="button" class="btn btn-outline-danger btn-sm" (click)="reloadApplication()">
+        <mp-icon name="refresh" [size]="14" />
+        Retry
+      </button>
+    </div>
+    <a routerLink="/applications"><mp-icon name="arrow-left" [size]="16" /> Back to applications</a>
+  }
+  @case ('loaded') {
+    @let app = view.data;
+    @if (submitted()) {
+      <div class="alert alert-success d-flex align-items-center gap-2" role="status">
+        <mp-icon name="check" [size]="18" />
+        Application submitted. It is now waiting for an admin to assign a reviewer.
+      </div>
+    }
+    <header class="mp-page-header">
+      <div>
+        <p class="mp-eyebrow">
+          {{ app.id }} · created by {{ app.createdBy.name }} {{ app.createdAt | relativeTime }}
+        </p>
+        <h1 class="mp-page-title d-flex align-items-center flex-wrap gap-2">
+          {{ app.business.legalName || 'Untitled draft' }}
+          <mp-status-badge [status]="app.status" />
+        </h1>
+        <p class="mp-page-subtitle">
+          Updated {{ app.updatedAt | relativeTime }} ·
+          @if (app.assignedReviewer; as reviewer) {
+            assigned to {{ reviewer.name }}
+          } @else {
+            unassigned
+          }
+        </p>
+      </div>
+      <div class="d-flex gap-2">
+        @if (isOwnDraft()) {
+          <a class="btn btn-primary" [routerLink]="['/applications', app.id, 'edit']">
+            Continue editing
+            <mp-icon name="arrow-right" [size]="16" />
+          </a>
+        }
+        <a class="btn btn-outline-secondary" routerLink="/applications">
+          <mp-icon name="arrow-left" [size]="16" />
+          Back to list
+        </a>
+      </div>
+    </header>
+
+    @if (actionError(); as message) {
+      <div class="alert alert-danger" role="alert">{{ message }}</div>
+    }
+
+    <div class="row g-4">
+      <div class="col-lg-8">
+        <section class="mp-card mb-4">
+          <div class="mp-card-header"><h2 class="mp-card-title">Business details</h2></div>
+          <div class="mp-card-body">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <div class="mp-field-label">Legal name</div>
+                <div class="mp-field-value">{{ app.business.legalName || '-' }}</div>
+              </div>
+              <div class="col-md-6">
+                <div class="mp-field-label">Registration number</div>
+                <div class="mp-field-value">{{ app.business.registrationNumber || '-' }}</div>
+              </div>
+              <div class="col-md-6">
+                <mp-masked-field
+                  label="Tax ID"
+                  [masked]="app.business.taxId || '-'"
+                  [canReveal]="canReveal()"
+                  [value]="revealed().taxId ?? null"
+                  [busy]="revealing() === 'taxId'"
+                  (reveal)="reveal('taxId')"
+                  (hide)="hide('taxId')"
+                />
+              </div>
+              <div class="col-md-6">
+                <div class="mp-field-label">Website</div>
+                <div class="mp-field-value">{{ app.business.website || '-' }}</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="mp-card">
+          <div class="mp-card-header"><h2 class="mp-card-title">Contacts & bank</h2></div>
+          <div class="mp-card-body">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <div class="mp-field-label">Contact email</div>
+                <div class="mp-field-value">{{ app.contacts.contactEmail || '-' }}</div>
+              </div>
+              <div class="col-md-6">
+                <div class="mp-field-label">Contact phone</div>
+                <div class="mp-field-value">{{ app.contacts.contactPhone || '-' }}</div>
+              </div>
+              <div class="col-md-6">
+                <div class="mp-field-label">Bank</div>
+                <div class="mp-field-value">{{ app.contacts.bankName || '-' }}</div>
+              </div>
+              <div class="col-md-6">
+                <mp-masked-field
+                  label="Account number"
+                  [masked]="app.contacts.accountNumber || '-'"
+                  [canReveal]="canReveal()"
+                  [value]="revealed().accountNumber ?? null"
+                  [busy]="revealing() === 'accountNumber'"
+                  (reveal)="reveal('accountNumber')"
+                  (hide)="hide('accountNumber')"
+                />
+              </div>
+              <div class="col-md-6">
+                <div class="mp-field-label">Expected monthly volume</div>
+                <div class="mp-field-value mp-tabular">
+                  @if (app.contacts.expectedMonthlyVolume; as volume) {
+                    NPR {{ volume | number: '1.0-0' }}
+                  } @else {
+                    -
+                  }
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mp-field-label">Max transaction amount</div>
+                <div class="mp-field-value mp-tabular">
+                  @if (app.contacts.maxTransactionAmount; as amount) {
+                    NPR {{ amount | number: '1.0-0' }}
+                  } @else {
+                    -
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <aside class="col-lg-4">
+        <div class="mp-side">
+          @if (canDecide()) {
+            <mp-decision-panel class="d-block mb-4" [busy]="busy()" (decide)="decide($event)" />
+          }
+          @if (canAssign()) {
+            <mp-assignment-panel
+              class="d-block mb-4"
+              [reviewers]="reviewers()"
+              [current]="app.assignedReviewer"
+              [busy]="busy()"
+              (assign)="assign($event)"
+            />
+          }
+          <mp-history-list [state]="history()" (retry)="reloadHistory()" />
+        </div>
+      </aside>
+    </div>
+  }
+}

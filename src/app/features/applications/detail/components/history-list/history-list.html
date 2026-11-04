@@ -1,0 +1,41 @@
+<section class="mp-card">
+  <div class="mp-card-header"><h2 class="mp-card-title">Risk history</h2></div>
+  <div class="mp-card-body">
+    @let view = state();
+    @switch (view.status) {
+      @case ('loading') {
+        <p class="placeholder-glow mb-0" aria-busy="true">
+          <span class="placeholder col-8"></span>
+        </p>
+      }
+      @case ('error') {
+        <div class="alert alert-danger small mb-0" role="alert">
+          Couldn't load history: {{ view.message }}
+          <button type="button" class="btn btn-link btn-sm p-0 ms-1" (click)="retry.emit()">
+            Retry
+          </button>
+        </div>
+      }
+      @case ('loaded') {
+        @if (view.data.length === 0) {
+          <p class="text-secondary small mb-0">No events yet.</p>
+        } @else {
+          <ol class="mp-timeline">
+            @for (entry of view.data; track entry.id) {
+              <li [class]="toneOf(entry)">
+                <span class="mp-timeline-dot" aria-hidden="true"></span>
+                <div class="mp-timeline-text">{{ describe(entry) }}</div>
+                @if (isDecision(entry) && entry.detail) {
+                  <q class="d-block small text-secondary">{{ entry.detail }}</q>
+                }
+                <div class="small text-secondary" [title]="entry.at | date: 'medium'">
+                  {{ entry.at | relativeTime }}
+                </div>
+              </li>
+            }
+          </ol>
+        }
+      }
+    }
+  </div>
+</section>

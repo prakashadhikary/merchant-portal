@@ -1,0 +1,21 @@
+<section class="mp-card">
+  <div class="mp-card-header"><h2 class="mp-card-title">Assignment</h2></div>
+  <div class="mp-card-body">
+    <label class="form-label" for="reviewer">Reviewer</label>
+    <select id="reviewer" class="form-select" [value]="selected()" (change)="onSelect($event)">
+      <option value="">Choose a reviewer</option>
+      @for (reviewer of reviewers(); track reviewer.id) {
+        <option [value]="reviewer.id">{{ reviewer.name }}</option>
+      }
+    </select>
+    <div class="form-text">Assigning moves the application to Under review.</div>
+    <button
+      type="button"
+      class="btn btn-primary mt-3"
+      [disabled]="!canAssign()"
+      (click)="assign.emit(selected())"
+    >
+      {{ current() ? 'Reassign' : 'Assign' }}
+    </button>
+  </div>
+</section>

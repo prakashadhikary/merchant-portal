@@ -1,0 +1,38 @@
+<section class="mp-card">
+  <div class="mp-card-header"><h2 class="mp-card-title">Risk decision</h2></div>
+  <div class="mp-card-body">
+    <label class="form-label" for="decision-note">Note</label>
+    <textarea
+      id="decision-note"
+      class="form-control"
+      rows="3"
+      placeholder="Why are you approving or rejecting?"
+      aria-describedby="decision-note-hint decision-note-error"
+      [formControl]="form.controls.note"
+      [class.is-invalid]="form.touched && form.invalid"
+    ></textarea>
+    <div id="decision-note-hint" class="form-text">
+      A note of at least 10 characters is required when rejecting.
+    </div>
+    <mp-field-error id="decision-note-error" [control]="form" />
+    <div class="d-grid d-sm-flex gap-2 mt-3">
+      <button
+        type="button"
+        class="btn btn-success flex-fill"
+        [disabled]="busy()"
+        (click)="submit('APPROVE')"
+      >
+        <mp-icon name="check" [size]="16" />
+        Approve
+      </button>
+      <button
+        type="button"
+        class="btn btn-outline-danger flex-fill"
+        [disabled]="busy()"
+        (click)="submit('REJECT')"
+      >
+        Reject
+      </button>
+    </div>
+  </div>
+</section>
