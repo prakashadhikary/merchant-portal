@@ -1,0 +1,94 @@
+<fieldset class="row g-3" [formGroup]="form()">
+  <legend class="visually-hidden">Contacts and bank</legend>
+  <div class="col-md-6">
+    <label class="form-label" for="contactEmail">Contact email</label>
+    <input
+      id="contactEmail"
+      type="email"
+      class="form-control"
+      formControlName="contactEmail"
+      autocomplete="email"
+      aria-describedby="contactEmail-error"
+      [class.is-invalid]="invalid(form().controls.contactEmail)"
+    />
+    <mp-field-error id="contactEmail-error" [control]="form().controls.contactEmail" />
+  </div>
+  <div class="col-md-6">
+    <label class="form-label" for="contactPhone">Contact phone</label>
+    <input
+      id="contactPhone"
+      type="tel"
+      class="form-control"
+      formControlName="contactPhone"
+      placeholder="+9779812345678"
+      autocomplete="tel"
+      aria-describedby="contactPhone-error"
+      [class.is-invalid]="invalid(form().controls.contactPhone)"
+    />
+    <mp-field-error id="contactPhone-error" [control]="form().controls.contactPhone" />
+  </div>
+  <div class="col-md-6">
+    <label class="form-label" for="bankName">Bank</label>
+    <select
+      id="bankName"
+      class="form-select"
+      formControlName="bankName"
+      aria-describedby="bankName-error"
+      [class.is-invalid]="invalid(form().controls.bankName)"
+    >
+      <option value="">Choose a bank</option>
+      @for (bank of banks; track bank) {
+        <option [value]="bank">{{ bank }}</option>
+      }
+    </select>
+    <mp-field-error id="bankName-error" [control]="form().controls.bankName" />
+  </div>
+  <div class="col-md-6">
+    <label class="form-label" for="accountNumber">
+      Account number <span class="text-secondary">(10–16 digits)</span>
+    </label>
+    <input
+      id="accountNumber"
+      class="form-control"
+      formControlName="accountNumber"
+      inputmode="numeric"
+      autocomplete="off"
+      aria-describedby="accountNumber-error"
+      [class.is-invalid]="invalid(form().controls.accountNumber)"
+    />
+    <mp-field-error id="accountNumber-error" [control]="form().controls.accountNumber" />
+  </div>
+  <div class="col-md-6">
+    <label class="form-label" for="expectedMonthlyVolume">Expected monthly volume (NPR)</label>
+    <input
+      id="expectedMonthlyVolume"
+      type="number"
+      min="1"
+      class="form-control"
+      formControlName="expectedMonthlyVolume"
+      aria-describedby="expectedMonthlyVolume-error"
+      [class.is-invalid]="invalid(form().controls.expectedMonthlyVolume)"
+    />
+    <mp-field-error
+      id="expectedMonthlyVolume-error"
+      [control]="form().controls.expectedMonthlyVolume"
+    />
+  </div>
+  <div class="col-md-6">
+    <label class="form-label" for="maxTransactionAmount">Max transaction amount (NPR)</label>
+    <input
+      id="maxTransactionAmount"
+      type="number"
+      min="1"
+      class="form-control"
+      formControlName="maxTransactionAmount"
+      aria-describedby="maxTransactionAmount-error maxTransactionAmount-group-error"
+      [class.is-invalid]="invalid(form().controls.maxTransactionAmount) || invalid(form())"
+    />
+    <mp-field-error
+      id="maxTransactionAmount-error"
+      [control]="form().controls.maxTransactionAmount"
+    />
+    <mp-field-error id="maxTransactionAmount-group-error" [control]="form()" />
+  </div>
+</fieldset>

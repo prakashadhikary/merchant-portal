@@ -1,0 +1,203 @@
+@let state = loadState();
+@switch (state.status) {
+  @case ('loading') {
+    <p class="text-secondary" aria-busy="true">
+      <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
+      Loading draft…
+    </p>
+  }
+  @case ('error') {
+    <div class="alert alert-danger" role="alert">{{ state.message }}</div>
+    <a routerLink="/applications"><mp-icon name="arrow-left" [size]="16" /> Back to applications</a>
+  }
+  @case ('loaded') {
+    <header class="mp-page-header">
+      <div>
+        <p class="mp-eyebrow">{{ state.data.id }} · Draft</p>
+        <h1 class="mp-page-title">Merchant application</h1>
+      </div>
+      <a class="btn btn-outline-secondary" routerLink="/applications">
+        <mp-icon name="arrow-left" [size]="16" />
+        Back to applications
+      </a>
+    </header>
+
+    <nav aria-label="Application form steps">
+      <ol class="mp-stepper">
+        @for (s of steps; track s; let i = $index) {
+          @let stepStatus = stepState(s);
+          <li
+            class="mp-step"
+            [class.is-current]="stepStatus === 'current'"
+            [class.is-complete]="stepStatus === 'complete'"
+          >
+            <button
+              type="button"
+              class="mp-step-button"
+              [disabled]="!canGoTo(s)"
+              [attr.aria-current]="stepStatus === 'current' ? 'step' : null"
+              (click)="goTo(s)"
+            >
+              <span class="mp-step-index" aria-hidden="true">
+                @if (stepStatus === 'complete') {
+                  <mp-icon name="check" [size]="14" />
+                } @else {
+                  {{ i + 1 }}
+                }
+              </span>
+              <span class="mp-step-label">{{ stepLabels[s] }}</span>
+            </button>
+          </li>
+        }
+      </ol>
+    </nav>
+
+    @let save = store.saveStatus();
+    <form class="mp-card" (submit)="$event.preventDefault(); onSubmit()" novalidate>
+      <div class="mp-card-header">
+        <div>
+          <p class="mp-eyebrow mb-0">Step {{ stepIndex() + 1 }} of {{ steps.length }}</p>
+          <h2 #stepHeading class="mp-card-title fs-5" tabindex="-1">{{ stepLabels[step()] }}</h2>
+        </div>
+        <div class="mp-save-status" aria-live="polite">
+          @switch (save.kind) {
+            @case ('dirty') {
+              <span class="mp-save-dot" aria-hidden="true"></span>
+              Unsaved changes
+            }
+            @case ('saving') {
+              <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+              Saving…
+            }
+            @case ('saved') {
+              <mp-icon class="text-success" name="check" [size]="16" />
+              Draft saved at {{ save.at | date: 'HH:mm:ss' }}
+            }
+            @case ('error') {
+              <mp-icon class="text-danger" name="alert" [size]="16" />
+              <span class="text-danger">Save failed: {{ save.message }}</span>
+              <button type="button" class="btn btn-link btn-sm p-0" (click)="store.saveNow()">
+                Retry
+              </button>
+            }
+          }
+        </div>
+      </div>
+
+      <div class="mp-card-body">
+        @switch (step()) {
+          @case ('business') {
+            <mp-business-step [form]="form.controls.business" />
+          }
+          @case ('contacts') {
+            <mp-contacts-step [form]="form.controls.contacts" />
+          }
+          @case ('review') {
+            @let value = form.getRawValue();
+            <div class="row g-3">
+              <section class="col-md-6">
+                <div class="mp-summary h-100">
+                  <div class="mp-summary-header">
+                    <h3 class="mp-card-title">Business details</h3>
+                    <button
+                      type="button"
+                      class="btn btn-link btn-sm p-0"
+                      (click)="goTo('business')"
+                    >
+                      Edit
+                    </button>
+                  </div>
+                  <dl class="mp-summary-list">
+                    <dt>Legal name</dt>
+                    <dd>{{ value.business.legalName }}</dd>
+                    <dt>Registration no.</dt>
+                    <dd>{{ value.business.registrationNumber }}</dd>
+                    <dt>Tax ID</dt>
+                    <dd>{{ value.business.taxId }}</dd>
+                    <dt>Website</dt>
+                    <dd>{{ value.business.website || '-' }}</dd>
+                  </dl>
+                </div>
+              </section>
+              <section class="col-md-6">
+                <div class="mp-summary h-100">
+                  <div class="mp-summary-header">
+                    <h3 class="mp-card-title">Contacts & bank</h3>
+                    <button
+                      type="button"
+                      class="btn btn-link btn-sm p-0"
+                      (click)="goTo('contacts')"
+                    >
+                      Edit
+                    </button>
+                  </div>
+                  <dl class="mp-summary-list">
+                    <dt>Contact email</dt>
+                    <dd>{{ value.contacts.contactEmail }}</dd>
+                    <dt>Contact phone</dt>
+                    <dd>{{ value.contacts.contactPhone }}</dd>
+                    <dt>Bank</dt>
+                    <dd>{{ value.contacts.bankName }}</dd>
+                    <dt>Account number</dt>
+                    <dd>{{ value.contacts.accountNumber }}</dd>
+                    <dt>Monthly volume</dt>
+                    <dd>NPR {{ value.contacts.expectedMonthlyVolume | number: '1.0-0' }}</dd>
+                    <dt>Max transaction</dt>
+                    <dd>NPR {{ value.contacts.maxTransactionAmount | number: '1.0-0' }}</dd>
+                  </dl>
+                </div>
+              </section>
+            </div>
+            <div class="form-check mt-4">
+              <input
+                id="declaration"
+                type="checkbox"
+                class="form-check-input"
+                [formControl]="form.controls.declaration"
+                aria-describedby="declaration-error"
+              />
+              <label class="form-check-label" for="declaration">
+                I confirm that the information above is accurate and complete.
+              </label>
+              <mp-field-error
+                id="declaration-error"
+                [control]="form.controls.declaration"
+                [messages]="{ required: 'Please confirm the declaration before submitting' }"
+              />
+            </div>
+          }
+        }
+
+        @if (submitError(); as message) {
+          <div class="alert alert-danger mt-3 mb-0" role="alert">{{ message }}</div>
+        }
+      </div>
+
+      <div class="mp-card-footer">
+        @if (stepIndex() > 0) {
+          <button type="button" class="btn btn-outline-secondary" (click)="back()">
+            <mp-icon name="arrow-left" [size]="16" />
+            Back
+          </button>
+        }
+        @if (step() === 'review') {
+          <button
+            type="submit"
+            class="btn btn-primary ms-auto"
+            [disabled]="submitting() || form.invalid"
+          >
+            @if (submitting()) {
+              <span class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
+            }
+            Submit application
+          </button>
+        } @else {
+          <button type="submit" class="btn btn-primary ms-auto">
+            Next
+            <mp-icon name="arrow-right" [size]="16" />
+          </button>
+        }
+      </div>
+    </form>
+  }
+}

@@ -1,0 +1,57 @@
+<fieldset class="row g-3" [formGroup]="form()">
+  <legend class="visually-hidden">Business details</legend>
+  <div class="col-md-6">
+    <label class="form-label" for="legalName">Legal name</label>
+    <input
+      id="legalName"
+      class="form-control"
+      formControlName="legalName"
+      autocomplete="organization"
+      aria-describedby="legalName-error"
+      [class.is-invalid]="invalid(form().controls.legalName)"
+    />
+    <mp-field-error id="legalName-error" [control]="form().controls.legalName" />
+  </div>
+  <div class="col-md-6">
+    <label class="form-label" for="registrationNumber">Registration number</label>
+    <input
+      id="registrationNumber"
+      class="form-control"
+      formControlName="registrationNumber"
+      placeholder="REG-2024-12345"
+      aria-describedby="registrationNumber-error"
+      [class.is-invalid]="invalid(form().controls.registrationNumber)"
+    />
+    <mp-field-error id="registrationNumber-error" [control]="form().controls.registrationNumber" />
+  </div>
+  <div class="col-md-6">
+    <label class="form-label" for="taxId"
+      >Tax ID <span class="text-secondary">(9 digits)</span></label
+    >
+    <input
+      id="taxId"
+      class="form-control"
+      formControlName="taxId"
+      inputmode="numeric"
+      autocomplete="off"
+      aria-describedby="taxId-error"
+      [class.is-invalid]="invalid(form().controls.taxId)"
+    />
+    <mp-field-error id="taxId-error" [control]="form().controls.taxId" />
+  </div>
+  <div class="col-md-6">
+    <label class="form-label" for="website"
+      >Website <span class="text-secondary">(optional)</span></label
+    >
+    <input
+      id="website"
+      type="url"
+      class="form-control"
+      formControlName="website"
+      placeholder="https://"
+      aria-describedby="website-error"
+      [class.is-invalid]="invalid(form().controls.website)"
+    />
+    <mp-field-error id="website-error" [control]="form().controls.website" />
+  </div>
+</fieldset>
