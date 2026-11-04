@@ -1,0 +1,4 @@
+// Global stylesheet: theme tokens → selective Bootstrap build → app primitives.
+@import 'theme';
+@import 'bootstrap';
+@import 'components';
