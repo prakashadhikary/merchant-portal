@@ -156,12 +156,14 @@ saved payload → switchMap(PUT)`, with `catchError` inside the inner observable
   visit. Submit stays disabled until the whole form, declaration included, is
   valid. Submit saves first, then posts,
   so the server validates exactly what the user saw. A `CanDeactivate` guard
-  and `beforeunload` stop unsaved edits from vanishing silently.
+  and `beforeunload` stop unsaved edits from vanishing silently; "Sign out"
+  navigates to `/logout`, where `signOutGuard` ends the session, so the prompt
+  runs first.
 - **Route-scoped state.** `ApplicationFormStore` is provided by
   `ApplicationFormPage`, so it is created and destroyed with the page.
 - **Lazy routes.** Login and the applications feature are separate chunks.
   Guards: `authGuard` (→ `/login?returnUrl=…`), `guestGuard`, `roleGuard(...)`
-  (→ `/forbidden`), `unsavedChangesGuard`.
+  (→ `/forbidden`), `signOutGuard` (→ `/login`), `unsavedChangesGuard`.
 
 ## Mock API
 
@@ -287,25 +289,33 @@ change detection:
 - `auth.service.spec.ts` - session hydration (including corrupt storage), login,
   logout, shared in-flight refresh, no resurrection after logout.
 - `auth.guard.spec.ts` - auth, guest and role guards and their redirects.
+- `layout.spec.ts` - Sign out keeps the session while the current page refuses
+  to be left; otherwise ends it and lands on /login.
+- `login-page.spec.ts` - the seed-size select shows the stored size.
 - `validators.spec.ts` - every custom validator, valid and invalid inputs.
 - `application-form.store.spec.ts` (fake timers) - dirty before debounce, save
   after the debounce, dedupe, pristine programmatic changes ignored, declaration
   toggles never save, saveNow, error keeps the form, retry, stale save
-  cancelled, submit saves first.
-- `application-form-page.spec.ts` - no manual Save button; Submit disabled
-  until the declaration makes the whole form valid.
+  cancelled, typing during a save keeps it dirty, submit saves first.
+- `application-form-page.spec.ts` - no manual Save button; focus moves to the
+  step heading on a step change; Submit disabled until the declaration makes
+  the whole form valid.
 - `masked-field.spec.ts` - no button for SALES, reveal, hide, 30 s re-mask,
   timer cleared on destroy.
 - `decision-panel.spec.ts` - approve without note, reject blocked by the note
   rule, reject with a valid note.
+- `assignment-panel.spec.ts` - the current reviewer is preselected, also when
+  the reviewer list arrives later.
 - `applications-list.store.spec.ts` - first page on creation, append on
   loadMore and stop when complete, duplicate loadMore ignored while in flight,
   filter change cancels and restarts from page 1, failed page keeps rows and
   retries.
 - `applications-list-page.spec.ts` - role-specific controls, first-load error and
-  retry, Load more appends the next page, debounced search starts a fresh list.
+  retry, Load more appends the next page, debounced search starts a fresh list,
+  the same term searches again after the filters were cleared.
 - `application-detail-page.spec.ts` - per-role controls, reveal refreshes only
-  the history, decision applies the server response.
+  the history, revealed values are dropped when the id changes, a failed
+  reviewer list keeps the page usable, decision applies the server response.
 - `fake-backend.spec.ts` - login/refresh/expiry, role scoping, masking, 404 for
   out-of-scope records, reveal permissions and audit, draft ownership, 422 on
   incomplete submit, assignment and decision rules.
