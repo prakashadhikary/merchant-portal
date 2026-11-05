@@ -1,4 +1,4 @@
-import type { UserRef } from './user.models';
+import type { UserRef } from '../../../shared/models/user.models';
 
 export type ApplicationStatus = 'DRAFT' | 'SUBMITTED' | 'UNDER_REVIEW' | 'APPROVED' | 'REJECTED';
 

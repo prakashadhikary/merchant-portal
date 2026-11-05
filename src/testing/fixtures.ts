@@ -2,7 +2,7 @@ import type {
   HistoryEntry,
   MerchantApplication,
   Page,
-} from '../app/shared/models/application.models';
+} from '../app/features/applications/models/application.models';
 import { DEMO_USERS, toRef } from '../mocks/data/mock-data';
 
 export function makeApplication(overrides: Partial<MerchantApplication> = {}): MerchantApplication {

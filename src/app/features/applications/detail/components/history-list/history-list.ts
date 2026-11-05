@@ -1,7 +1,7 @@
 import { DatePipe } from '@angular/common';
 import { Component, input, output } from '@angular/core';
 import { Loadable } from '../../../../../core/http/helpers/loadable';
-import { HistoryEntry } from '../../../../../shared/models/application.models';
+import { HistoryEntry } from '../../../models/application.models';
 import { RelativeTimePipe } from '../../../../../shared/pipes/relative-time.pipe';
 
 type Tone = 'secondary' | 'primary' | 'warning' | 'success' | 'danger';

@@ -5,7 +5,7 @@ import { provideRouter } from '@angular/router';
 import { DEMO_USERS, toRef } from '../../../../../mocks/data/mock-data';
 import { seedSession } from '../../../../../testing/auth';
 import { makeApplication, makeHistoryEntry } from '../../../../../testing/fixtures';
-import type { MerchantApplication } from '../../../../shared/models/application.models';
+import type { MerchantApplication } from '../../models/application.models';
 import type { Role } from '../../../../shared/models/user.models';
 import { ApplicationDetailPage } from './application-detail-page';
 

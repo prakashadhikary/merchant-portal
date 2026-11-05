@@ -12,12 +12,12 @@ import {
   MerchantApplication,
   REVIEWABLE_STATUSES,
   SensitiveField,
-} from '../../../../shared/models/application.models';
+} from '../../models/application.models';
 import { UserRef } from '../../../../shared/models/user.models';
 import { RelativeTimePipe } from '../../../../shared/pipes/relative-time.pipe';
 import { Icon } from '../../../../shared/components/icon/icon';
 import { MaskedField } from '../../../../shared/components/masked-field/masked-field';
-import { StatusBadge } from '../../../../shared/components/status-badge/status-badge';
+import { StatusBadge } from '../../components/status-badge/status-badge';
 import { ApplicationsApi } from '../../services/applications.api';
 import { AssignmentPanel } from '../components/assignment-panel/assignment-panel';
 import { DecisionPanel } from '../components/decision-panel/decision-panel';

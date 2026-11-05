@@ -13,11 +13,7 @@ import {
   tap,
 } from 'rxjs';
 import { errorMessage } from '../../../../core/http/helpers/api-error';
-import {
-  ApplicationStatus,
-  MerchantApplication,
-  Page,
-} from '../../../../shared/models/application.models';
+import { ApplicationStatus, MerchantApplication, Page } from '../../models/application.models';
 import { ApplicationsApi } from '../../services/applications.api';
 
 export interface ListFilters {

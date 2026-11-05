@@ -1,5 +1,5 @@
 import { FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
-import { ApplicationData } from '../../../../shared/models/application.models';
+import { ApplicationData } from '../../models/application.models';
 import {
   accountNumber,
   e164Phone,

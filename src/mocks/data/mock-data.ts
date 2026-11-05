@@ -2,8 +2,8 @@ import type {
   ApplicationStatus,
   HistoryEntry,
   MerchantApplication,
-} from '../../app/shared/models/application.models';
-import { BANKS } from '../../app/shared/models/application.models';
+} from '../../app/features/applications/models/application.models';
+import { BANKS } from '../../app/features/applications/models/application.models';
 import type { Role, User, UserRef } from '../../app/shared/models/user.models';
 
 /** Every name, company and number here is invented. Nothing refers to a real entity. */

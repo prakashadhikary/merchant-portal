@@ -1,6 +1,6 @@
 import { Component, input } from '@angular/core';
 import { AbstractControl, ReactiveFormsModule } from '@angular/forms';
-import { BANKS } from '../../../../../shared/models/application.models';
+import { BANKS } from '../../../models/application.models';
 import { FieldError } from '../../../../../shared/components/field-error/field-error';
 import { ContactsForm } from '../../helpers/application-form.helper';
 

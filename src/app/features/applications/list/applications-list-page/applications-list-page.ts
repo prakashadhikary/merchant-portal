@@ -8,12 +8,12 @@ import { AuthService } from '../../../../core/auth/services/auth.service';
 import { errorMessage } from '../../../../core/http/helpers/api-error';
 import { Avatar } from '../../../../shared/components/avatar/avatar';
 import { Icon } from '../../../../shared/components/icon/icon';
-import { StatusBadge } from '../../../../shared/components/status-badge/status-badge';
+import { StatusBadge } from '../../components/status-badge/status-badge';
 import {
   APPLICATION_STATUSES,
   MerchantApplication,
   STATUS_LABELS,
-} from '../../../../shared/models/application.models';
+} from '../../models/application.models';
 import { RelativeTimePipe } from '../../../../shared/pipes/relative-time.pipe';
 import { ApplicationsApi } from '../../services/applications.api';
 import { ApplicationsListStore } from '../services/applications-list.store';
@@ -30,7 +30,7 @@ interface RowAction {
 }
 
 @Component({
-  selector: 'mp-applications-page',
+  selector: 'mp-applications-list-page',
   imports: [
     RouterLink,
     DatePipe,
@@ -42,10 +42,10 @@ interface RowAction {
     Icon,
   ],
   providers: [ApplicationsListStore],
-  templateUrl: './applications-page.html',
-  styleUrl: './applications-page.scss',
+  templateUrl: './applications-list-page.html',
+  styleUrl: './applications-list-page.scss',
 })
-export class ApplicationsPage {
+export class ApplicationsListPage {
   readonly store = inject(ApplicationsListStore);
   readonly auth = inject(AuthService);
 

@@ -14,7 +14,7 @@ import {
   tap,
 } from 'rxjs';
 import { errorMessage } from '../../../../core/http/helpers/api-error';
-import { MerchantApplication } from '../../../../shared/models/application.models';
+import { MerchantApplication } from '../../models/application.models';
 import { ApplicationsApi } from '../../services/applications.api';
 import { buildApplicationForm, toApplicationData } from '../helpers/application-form.helper';
 

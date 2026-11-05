@@ -14,13 +14,13 @@ import type {
   Page,
   RevealResult,
   SensitiveField,
-} from '../../app/shared/models/application.models';
+} from '../../app/features/applications/models/application.models';
 import {
   APPLICATION_STATUSES,
   PAGE_SIZES,
   REVIEWABLE_STATUSES,
   SENSITIVE_FIELD_LABELS,
-} from '../../app/shared/models/application.models';
+} from '../../app/features/applications/models/application.models';
 import type { User, UserRef } from '../../app/shared/models/user.models';
 import { EMPTY_BUSINESS, EMPTY_CONTACTS, MockDb, USERS, toRef } from '../data/mock-data';
 

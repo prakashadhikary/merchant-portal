@@ -2,7 +2,7 @@ import { Component, input, output } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { FieldError } from '../../../../../shared/components/field-error/field-error';
 import { Icon } from '../../../../../shared/components/icon/icon';
-import { Decision, DecisionInput } from '../../../../../shared/models/application.models';
+import { Decision, DecisionInput } from '../../../models/application.models';
 import { noteRequiredWhenRejecting } from '../../../../../shared/validators/validators';
 
 @Component({

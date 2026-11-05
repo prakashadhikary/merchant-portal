@@ -5,10 +5,10 @@ import { provideRouter } from '@angular/router';
 import type { Role } from '../../../../shared/models/user.models';
 import { seedSession } from '../../../../../testing/auth';
 import { makeApplication, makePage } from '../../../../../testing/fixtures';
-import { ApplicationsPage, SEARCH_DEBOUNCE_MS } from './applications-page';
+import { ApplicationsListPage, SEARCH_DEBOUNCE_MS } from './applications-list-page';
 
-describe('ApplicationsPage', () => {
-  let fixture: ComponentFixture<ApplicationsPage>;
+describe('ApplicationsListPage', () => {
+  let fixture: ComponentFixture<ApplicationsListPage>;
   let http: HttpTestingController;
 
   function render(role: Role): void {
@@ -17,7 +17,7 @@ describe('ApplicationsPage', () => {
       providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([])],
     });
     http = TestBed.inject(HttpTestingController);
-    fixture = TestBed.createComponent(ApplicationsPage);
+    fixture = TestBed.createComponent(ApplicationsListPage);
     fixture.detectChanges();
   }
 

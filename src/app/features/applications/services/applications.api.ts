@@ -10,7 +10,7 @@ import type {
   Page,
   RevealResult,
   SensitiveField,
-} from '../../../shared/models/application.models';
+} from '../models/application.models';
 import type { UserRef } from '../../../shared/models/user.models';
 
 /** Thin typed wrapper over the HTTP endpoints; no state, no error handling. */

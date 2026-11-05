@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import type { Mock } from 'vitest';
-import { DecisionInput } from '../../../../../shared/models/application.models';
+import { DecisionInput } from '../../../models/application.models';
 import { DecisionPanel } from './decision-panel';
 
 describe('DecisionPanel', () => {

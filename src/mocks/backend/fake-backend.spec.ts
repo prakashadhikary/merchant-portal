@@ -1,5 +1,8 @@
 import { HttpErrorResponse, HttpHeaders, HttpRequest, HttpResponse } from '@angular/common/http';
-import type { MerchantApplication, Page } from '../../app/shared/models/application.models';
+import type {
+  MerchantApplication,
+  Page,
+} from '../../app/features/applications/models/application.models';
 import type { User } from '../../app/shared/models/user.models';
 import { makeSession } from '../../testing/auth';
 import { handleRequest } from './fake-backend';

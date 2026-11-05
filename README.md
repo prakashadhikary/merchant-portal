@@ -73,18 +73,20 @@ src/app
     layout/                  navbar + <router-outlet>
     pages/                   forbidden-page/, not-found-page/
   shared/                    reusable, feature-agnostic building blocks
-    components/              avatar/, field-error/, icon/, masked-field/, status-badge/
+    components/              avatar/, field-error/, icon/, masked-field/
     helpers/                 validation error messages
-    models/                  domain types and reference data
+    models/                  user and role types
     pipes/                   relativeTime
     validators/              custom validators as pure functions
   features/                  one folder per feature, one sub-folder per screen
     login/login-page/
     applications/
       applications.routes.ts
+      models/                application types, statuses and reference data
+      components/            status-badge/ (shared by the list and detail pages)
       services/              ApplicationsApi - thin typed HttpClient wrapper
       list/
-        applications-page/   the smart page (virtual scroll viewport)
+        applications-list-page/ the smart page (virtual scroll viewport)
         services/            ApplicationsListStore (filters + infinite paging)
       form/
         application-form-page/ the smart page
@@ -121,7 +123,8 @@ which keeps the Content Security Policy at `'self'`.
 
 - **Smart vs presentational.** Only the `*-page.ts` components inject services
   and know about routing. Everything under `shared/components`,
-  `form/components` and `detail/*-panel` takes `input()`s and emits `output()`s.
+  `applications/components`, `form/components` and `detail/*-panel` takes
+  `input()`s and emits `output()`s.
 - **Signals at the edge, RxJS in the middle.** Pages expose signals to templates.
   Async work is an RxJS pipeline (`toObservable(query) → switchMap(api.call) →
 toLoadable() → toSignal`), so a newer request always cancels an older one.
@@ -295,7 +298,7 @@ change detection:
   loadMore and stop when complete, duplicate loadMore ignored while in flight,
   filter change cancels and restarts from page 1, failed page keeps rows and
   retries.
-- `applications-page.spec.ts` - role-specific controls, first-load error and
+- `applications-list-page.spec.ts` - role-specific controls, first-load error and
   retry, Load more appends the next page, debounced search starts a fresh list.
 - `application-detail-page.spec.ts` - per-role controls, reveal refreshes only
   the history, decision applies the server response.
