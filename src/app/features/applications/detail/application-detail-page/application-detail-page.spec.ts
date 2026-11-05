@@ -98,6 +98,17 @@ describe('ApplicationDetailPage', () => {
     expect(text()).toContain('Tax ID revealed by Rita Shrestha');
   });
 
+  it('keeps the page usable for ADMIN when the reviewer list fails to load', () => {
+    render('ADMIN', underReview);
+    http
+      .expectOne('/api/reviewers')
+      .flush({ message: 'Reviewers unavailable' }, { status: 500, statusText: 'Server Error' });
+    fixture.detectChanges();
+    expect(text()).toContain('Assignment');
+    expect(text()).toContain('Reviewers unavailable');
+    expect(fixture.componentInstance.reviewers()).toEqual([]);
+  });
+
   it('applies the server response after a decision and drops the decision panel', () => {
     render('REVIEWER', underReview);
     fixture.componentInstance.decide({ decision: 'APPROVE' });

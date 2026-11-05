@@ -2,7 +2,7 @@ import { DecimalPipe } from '@angular/common';
 import { Component, computed, inject, input, linkedSignal, signal } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { Router, RouterLink } from '@angular/router';
-import { map, merge, Observable, of, Subject, switchMap } from 'rxjs';
+import { catchError, map, merge, Observable, of, Subject, switchMap } from 'rxjs';
 import { AuthService } from '../../../../core/auth/services/auth.service';
 import { errorMessage } from '../../../../core/http/helpers/api-error';
 import { Loadable, LOADING, toLoadable } from '../../../../core/http/helpers/loadable';
@@ -71,11 +71,6 @@ export class ApplicationDetailPage {
     { initialValue: LOADING as Loadable<HistoryEntry[]> },
   );
 
-  readonly reviewers = toSignal(
-    this.auth.hasRole('ADMIN') ? this.api.reviewers() : of<UserRef[]>([]),
-    { initialValue: [] as UserRef[] },
-  );
-
   readonly submitted = signal(
     this.router.getCurrentNavigation()?.extras.state?.['submitted'] === true,
   );
@@ -83,6 +78,18 @@ export class ApplicationDetailPage {
   readonly revealing = signal<SensitiveField | null>(null);
   readonly busy = signal(false);
   readonly actionError = signal<string | null>(null);
+
+  readonly reviewers = toSignal(
+    this.auth.hasRole('ADMIN')
+      ? this.api.reviewers().pipe(
+          catchError((error: unknown) => {
+            this.actionError.set(errorMessage(error));
+            return of<UserRef[]>([]);
+          }),
+        )
+      : of<UserRef[]>([]),
+    { initialValue: [] as UserRef[] },
+  );
 
   private readonly loaded = computed(() => {
     const state = this.application();
