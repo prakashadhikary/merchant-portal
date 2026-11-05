@@ -71,22 +71,7 @@
         </div>
       </div>
     } @else {
-      <div
-        class="mp-grid"
-        role="table"
-        aria-label="Merchant applications"
-        aria-busy="true"
-        [class.mp-grid-admin]="isAdmin()"
-      >
-        <ng-container *ngTemplateOutlet="gridHead" />
-        <div role="rowgroup">
-          @for (row of skeletonRows; track row) {
-            <div class="mp-grid-row" role="row">
-              <ng-container *ngTemplateOutlet="skeletonCells" />
-            </div>
-          }
-        </div>
-      </div>
+      <mp-applications-table [busy]="true" [role]="auth.user()?.role" />
     }
   } @else if (state.total === 0) {
     <div class="mp-empty">
@@ -108,74 +93,11 @@
       }
     </div>
   } @else {
-    <div
-      class="mp-grid"
-      role="table"
-      aria-label="Merchant applications"
-      [attr.aria-rowcount]="state.total"
-      [class.mp-grid-admin]="isAdmin()"
-    >
-      <ng-container *ngTemplateOutlet="gridHead" />
-      <!-- Scrolls with the page; only the rows in and around the window exist in the DOM. -->
-      <cdk-virtual-scroll-viewport
-        scrollWindow
-        role="rowgroup"
-        [itemSize]="rowHeight"
-        [minBufferPx]="rowHeight * 4"
-        [maxBufferPx]="rowHeight * 8"
-      >
-        <div
-          class="mp-grid-row"
-          role="row"
-          *cdkVirtualFor="let app of state.rows; trackBy: trackRow; let i = index"
-          [attr.aria-rowindex]="i + 1"
-          [attr.aria-busy]="app ? null : true"
-        >
-          @if (app) {
-            <span role="cell" class="mp-col-business">
-              <span class="d-block fw-medium text-truncate">
-                {{ app.business.legalName || 'Untitled draft' }}
-              </span>
-              <span class="d-block small text-secondary">{{ app.id }}</span>
-            </span>
-            <span role="cell" class="mp-col-status"><mp-status-badge [status]="app.status" /></span>
-            <span role="cell" class="mp-col-volume text-end mp-tabular">
-              @if (app.contacts.expectedMonthlyVolume; as volume) {
-                NPR {{ volume | number: '1.0-0' }}
-              } @else {
-                <span class="text-secondary">-</span>
-              }
-            </span>
-            <span role="cell" class="mp-col-reviewer">
-              @if (app.assignedReviewer; as reviewer) {
-                <span class="d-inline-flex align-items-center gap-2 mw-100">
-                  <mp-avatar [name]="reviewer.name" size="sm" />
-                  <span class="text-truncate">{{ reviewer.name }}</span>
-                </span>
-              } @else {
-                <span class="text-secondary">—</span>
-              }
-            </span>
-            @if (isAdmin()) {
-              <span role="cell" class="mp-col-creator text-truncate">{{ app.createdBy.name }}</span>
-            }
-            <span role="cell" class="mp-col-updated text-secondary">
-              <span [title]="app.updatedAt | date: 'medium'">{{
-                app.updatedAt | relativeTime
-              }}</span>
-            </span>
-            <span role="cell" class="mp-col-action text-end">
-              @let action = actionFor(app);
-              <a class="btn btn-sm btn-outline-primary" [routerLink]="action.link">
-                {{ action.label }}
-              </a>
-            </span>
-          } @else {
-            <ng-container *ngTemplateOutlet="skeletonCells" />
-          }
-        </div>
-      </cdk-virtual-scroll-viewport>
-    </div>
+    <mp-applications-table
+      [rows]="state.rows"
+      [role]="auth.user()?.role"
+      (rangeChange)="store.loadRange($event.start, $event.end)"
+    />
     <div class="mp-card-footer mp-list-footer" aria-live="polite">
       <span class="text-secondary small"
         >Loaded {{ store.loadedCount() | number }} of {{ state.total | number }}</span
@@ -197,49 +119,3 @@
     </div>
   }
 </section>
-
-<!-- Shared by the first-load skeleton and the loaded grid so their columns always match. -->
-<ng-template #gridHead>
-  <div class="mp-grid-head" role="rowgroup">
-    <div class="mp-grid-row mp-grid-row-head" role="row">
-      <span role="columnheader">Business</span>
-      <span role="columnheader" class="mp-col-status">Status</span>
-      <span role="columnheader" class="mp-col-volume text-end">Monthly volume</span>
-      <span role="columnheader" class="mp-col-reviewer">Reviewer</span>
-      @if (isAdmin()) {
-        <span role="columnheader" class="mp-col-creator">Created by</span>
-      }
-      <span role="columnheader" class="mp-col-updated">Updated</span>
-      <span role="columnheader" class="mp-col-action">
-        <span class="visually-hidden">Action</span>
-      </span>
-    </div>
-  </div>
-</ng-template>
-
-<ng-template #skeletonCells>
-  <span role="cell" class="mp-col-business placeholder-glow">
-    <span class="placeholder col-8 d-block mb-1"></span>
-    <span class="placeholder placeholder-xs col-4"></span>
-  </span>
-  <span role="cell" class="mp-col-status placeholder-glow">
-    <span class="placeholder col-10"></span>
-  </span>
-  <span role="cell" class="mp-col-volume placeholder-glow text-end">
-    <span class="placeholder col-8"></span>
-  </span>
-  <span role="cell" class="mp-col-reviewer placeholder-glow">
-    <span class="placeholder col-9"></span>
-  </span>
-  @if (isAdmin()) {
-    <span role="cell" class="mp-col-creator placeholder-glow">
-      <span class="placeholder col-8"></span>
-    </span>
-  }
-  <span role="cell" class="mp-col-updated placeholder-glow">
-    <span class="placeholder col-10"></span>
-  </span>
-  <span role="cell" class="mp-col-action placeholder-glow text-end">
-    <span class="placeholder col-10"></span>
-  </span>
-</ng-template>

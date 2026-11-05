@@ -7,11 +7,8 @@ import { provideRouter } from '@angular/router';
 import type { Role } from '../../../../shared/models/user.models';
 import { seedSession } from '../../../../../testing/auth';
 import { makeApplication, makePage } from '../../../../../testing/fixtures';
-import {
-  ApplicationsListPage,
-  RANGE_SETTLE_MS,
-  SEARCH_DEBOUNCE_MS,
-} from './applications-list-page';
+import { RANGE_SETTLE_MS } from '../components/applications-table/applications-table';
+import { ApplicationsListPage, SEARCH_DEBOUNCE_MS } from './applications-list-page';
 
 describe('ApplicationsListPage', () => {
   let fixture: ComponentFixture<ApplicationsListPage>;
