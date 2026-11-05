@@ -195,6 +195,10 @@ session.
 
 Status flow: `DRAFT → SUBMITTED → UNDER_REVIEW → APPROVED | REJECTED`.
 
+Every response that returns an application is masked by the same rule as
+`GET /api/applications/:id`, including the records returned by submit, assign
+and decision.
+
 To use a real backend, remove `fakeBackendInterceptor` from `app.config.ts` and
 point `ApplicationsApi` / `AuthService` at its base URL. Nothing else changes.
 

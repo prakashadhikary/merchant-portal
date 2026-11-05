@@ -220,7 +220,7 @@ export function submitApplication(
   if (Object.keys(errors).length > 0) fail(422, 'The application is incomplete', errors);
   const submitted = update(db, app, { status: 'SUBMITTED', updatedAt: now });
   addHistory(db, submitted, 'SUBMITTED', actor, now);
-  return submitted;
+  return toClientView(submitted, actor);
 }
 
 export function getHistory(db: MockDb, actor: User, id: string): HistoryEntry[] {
@@ -270,7 +270,7 @@ export function assignReviewer(
     updatedAt: now,
   });
   addHistory(db, assigned, 'ASSIGNED', actor, now, reviewer.name);
-  return assigned;
+  return toClientView(assigned, actor);
 }
 
 export function recordDecision(
@@ -295,7 +295,7 @@ export function recordDecision(
   const status = decision === 'APPROVE' ? 'APPROVED' : 'REJECTED';
   const decided = update(db, app, { status, updatedAt: now });
   addHistory(db, decided, status, actor, now, note || undefined);
-  return decided;
+  return toClientView(decided, actor);
 }
 
 /** ISO-8601 timestamps sort correctly as plain strings, far cheaper than localeCompare on big lists. */

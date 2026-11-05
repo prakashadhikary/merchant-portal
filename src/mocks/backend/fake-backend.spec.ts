@@ -146,6 +146,38 @@ describe('fake backend', () => {
       );
     });
 
+    it('masks the record returned by submit, assign and decision too', () => {
+      const draft = find(
+        (a) => a.status === 'DRAFT' && a.createdBy.id === sales.id && a.business.taxId !== '',
+      );
+      const submitted = send<MerchantApplication>(
+        'POST',
+        `/api/applications/${draft.id}/submit`,
+        {},
+        sales,
+      );
+      expect(submitted.business.taxId).toMatch(/^•+\d{2}$/);
+      expect(submitted.contacts.accountNumber).toMatch(/^•+\d{4}$/);
+
+      const assigned = send<MerchantApplication>(
+        'POST',
+        `/api/applications/${submitted.id}/assign`,
+        { reviewerId: reviewer.id },
+        admin,
+      );
+      expect(assigned.business.taxId).toMatch(/^•+\d{2}$/);
+      expect(assigned.contacts.accountNumber).toMatch(/^•+\d{4}$/);
+
+      const decided = send<MerchantApplication>(
+        'POST',
+        `/api/applications/${assigned.id}/decision`,
+        { decision: 'APPROVE' },
+        reviewer,
+      );
+      expect(decided.business.taxId).toMatch(/^•+\d{2}$/);
+      expect(decided.contacts.accountNumber).toMatch(/^•+\d{4}$/);
+    });
+
     it('hides out-of-scope applications behind a 404', () => {
       const foreign = find((a) => a.createdBy.id !== sales.id);
       expect(statusOf(() => get(`/api/applications/${foreign.id}`, sales))).toBe(404);
