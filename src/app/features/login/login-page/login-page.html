@@ -68,11 +68,12 @@
           #sizeSelect
           id="seed-size"
           class="form-select form-select-sm w-auto"
-          [value]="seedSize()"
           (change)="setSeedSize(sizeSelect.value)"
         >
           @for (size of seedSizes; track size) {
-            <option [value]="size">{{ size | number }} applications</option>
+            <option [value]="size" [selected]="size === seedSize()">
+              {{ size | number }} applications
+            </option>
           }
         </select>
         <button type="button" class="btn btn-outline-secondary btn-sm" (click)="resetDemoData()">
