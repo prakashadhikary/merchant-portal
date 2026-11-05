@@ -98,11 +98,13 @@ A few decisions worth knowing about:
 - **`Loadable<T>`** is a `loading | loaded | error` union that templates
   `@switch` on. The detail page and the form load through it, so loading,
   error and retry states come for free.
-- **The dashboard** pages server-side in batches of 25, appends on scroll
-  (`exhaustMap` ignores a second request while one is in flight) and renders
-  rows in a CDK virtual-scroll viewport. The DOM holds only the rows near the
-  viewport, whether the list has 40 entries or 10,000. A "Load more" button is
-  the keyboard fallback.
+- **The dashboard** scrolls with the page and sizes itself to the total from
+  the first response, showing a skeleton for every row not loaded yet. It
+  fetches only the 25-row pages covering the rows on screen once scrolling
+  settles, so jumping to the end skips the pages in between; a failed page
+  waits for Retry. Rows render in a CDK virtual-scroll viewport, so the DOM
+  holds only the rows near the window, whether the list has 40 entries or
+  10,000.
 - **Auto-save** debounces typed changes by a second, skips saves that match the
   last payload and uses `switchMap` so a stale save is cancelled. The form is
   never patched from a response, so nothing typed mid-save is lost. There is no

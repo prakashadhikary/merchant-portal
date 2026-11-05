@@ -1,11 +1,17 @@
+import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 import { provideRouter } from '@angular/router';
 import type { Role } from '../../../../shared/models/user.models';
 import { seedSession } from '../../../../../testing/auth';
 import { makeApplication, makePage } from '../../../../../testing/fixtures';
-import { ApplicationsListPage, SEARCH_DEBOUNCE_MS } from './applications-list-page';
+import {
+  ApplicationsListPage,
+  RANGE_SETTLE_MS,
+  SEARCH_DEBOUNCE_MS,
+} from './applications-list-page';
 
 describe('ApplicationsListPage', () => {
   let fixture: ComponentFixture<ApplicationsListPage>;
@@ -52,8 +58,23 @@ describe('ApplicationsListPage', () => {
     );
     await settle();
     expect(text()).toContain('Everest Coffee');
-    expect(text()).toContain('Showing 1 of 1');
+    expect(text()).toContain('Loaded 1 of 1');
     expect(text()).toContain('All applications loaded');
+  });
+
+  it.each<[Role, number]>([
+    ['ADMIN', 7],
+    ['SALES', 6],
+  ])('gives every first-load skeleton row a cell per column for %s', (role, columns) => {
+    render(role);
+    const grid = (fixture.nativeElement as HTMLElement).querySelector('[role="table"]');
+    if (!grid) throw new Error('skeleton grid missing');
+    expect(grid.getAttribute('aria-busy')).toBe('true');
+    expect(grid.querySelectorAll('[role="columnheader"]')).toHaveLength(columns);
+    const rows = grid.querySelectorAll('[role="rowgroup"]:not(.mp-grid-head) [role="row"]');
+    expect(rows.length).toBeGreaterThan(0);
+    rows.forEach((row) => expect(row.querySelectorAll('[role="cell"]')).toHaveLength(columns));
+    expectList().flush(makePage([]));
   });
 
   it('offers "New application" to SALES only', async () => {
@@ -88,22 +109,45 @@ describe('ApplicationsListPage', () => {
     expect(text()).toContain('Everest Coffee House');
   });
 
-  it('offers Load more while pages remain and appends the next page', async () => {
+  it('shows a skeleton for every row not loaded yet and fetches the pages scrolled to', async () => {
+    render('ADMIN');
+    expectList().flush(makePage([makeApplication()], 100));
+    await settle();
+    expect(text()).toContain('Loaded 1 of 100');
+    const host = fixture.debugElement.query(By.directive(CdkVirtualScrollViewport));
+    const skeletons = (host.nativeElement as HTMLElement).querySelectorAll('[aria-busy="true"]');
+    expect(skeletons.length).toBeGreaterThan(0);
+
+    // jsdom has no layout, so stand in for the user dragging to the end of the
+    // list, after the viewport's first scroll check (an animation frame) has run.
+    await new Promise((resolve) => setTimeout(resolve, RANGE_SETTLE_MS));
+    http.expectNone((r) => r.url === '/api/applications');
+    host.injector.get(CdkVirtualScrollViewport).setRenderedRange({ start: 90, end: 100 });
+    await new Promise((resolve) => setTimeout(resolve, RANGE_SETTLE_MS));
+    const req = expectList();
+    expect(req.request.params.get('page')).toBe('4');
+    req.flush(makePage([makeApplication({ id: 'APP-0100' })], 100));
+    await settle();
+    expect(text()).toContain('Loaded 2 of 100');
+  });
+
+  it('shows a failed page in the footer and re-requests it on Retry', async () => {
     render('ADMIN');
     expectList().flush(makePage([makeApplication()], 30));
+    fixture.componentInstance.store.loadRange(25, 30);
+    expectList().flush({ message: 'boom' }, { status: 500, statusText: 'Server Error' });
     await settle();
-    expect(text()).toContain('Showing 1 of 30');
+    expect(text()).toContain("Couldn't load some rows: boom");
 
-    const loadMore = Array.from(
+    const retry = Array.from(
       (fixture.nativeElement as HTMLElement).querySelectorAll('button'),
-    ).find((b) => b.textContent?.trim() === 'Load more');
-    loadMore?.click();
-    await settle();
+    ).find((b) => b.textContent?.trim() === 'Retry');
+    retry?.click();
     const req = expectList();
     expect(req.request.params.get('page')).toBe('2');
-    req.flush(makePage([makeApplication({ id: 'APP-0002' })], 30));
+    req.flush(makePage([makeApplication({ id: 'APP-0026' })], 30));
     await settle();
-    expect(text()).toContain('Showing 2 of 30');
+    expect(text()).not.toContain("Couldn't load some rows");
   });
 
   it('debounces the search and starts a fresh list', () => {

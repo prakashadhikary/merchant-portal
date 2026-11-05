@@ -1,9 +1,9 @@
 import { CdkVirtualScrollViewport, ScrollingModule } from '@angular/cdk/scrolling';
-import { DatePipe, DecimalPipe } from '@angular/common';
+import { DatePipe, DecimalPipe, NgTemplateOutlet } from '@angular/common';
 import { Component, computed, inject, signal, viewChild } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { Router, RouterLink } from '@angular/router';
-import { debounceTime, filter, Subject } from 'rxjs';
+import { debounceTime, EMPTY, filter, Subject, switchMap } from 'rxjs';
 import { AuthService } from '../../../../core/auth/services/auth.service';
 import { errorMessage } from '../../../../core/http/helpers/api-error';
 import { Avatar } from '../../../../shared/components/avatar/avatar';
@@ -21,8 +21,12 @@ import { ApplicationsListStore } from '../services/applications-list.store';
 export const SEARCH_DEBOUNCE_MS = 300;
 /** Fixed row height in px; the virtual scroll strategy relies on every row being this tall. */
 export const ROW_HEIGHT = 64;
-/** Fetch the next page when the rendered range gets this close to the last loaded row. */
-const PREFETCH_ROWS = 5;
+/**
+ * How long the rendered range must hold still before its pages are fetched,
+ * so dragging the scrollbar across the list does not request every page it
+ * passes over.
+ */
+export const RANGE_SETTLE_MS = 150;
 
 interface RowAction {
   readonly label: 'Continue' | 'Review' | 'View';
@@ -35,6 +39,7 @@ interface RowAction {
     RouterLink,
     DatePipe,
     DecimalPipe,
+    NgTemplateOutlet,
     RelativeTimePipe,
     ScrollingModule,
     StatusBadge,
@@ -83,6 +88,16 @@ export class ApplicationsListPage {
         takeUntilDestroyed(),
       )
       .subscribe((q) => this.store.setFilters({ q }));
+
+    // The viewport scrolls with the window and is sized for every row, so its
+    // rendered range (visible rows plus buffer) is exactly what to fetch.
+    toObservable(this.viewport)
+      .pipe(
+        switchMap((viewport) => viewport?.renderedRangeStream ?? EMPTY),
+        debounceTime(RANGE_SETTLE_MS),
+        takeUntilDestroyed(),
+      )
+      .subscribe(({ start, end }) => this.store.loadRange(start, end));
   }
 
   search(value: string): void {
@@ -97,17 +112,9 @@ export class ApplicationsListPage {
     this.store.setFilters({ q: '', status: '' });
   }
 
-  /** Called by the viewport as the user scrolls; fetches ahead before the last row is reached. */
-  onScrolled(): void {
-    const viewport = this.viewport();
-    if (!viewport) return;
-    if (viewport.getRenderedRange().end >= this.store.state().items.length - PREFETCH_ROWS) {
-      this.store.loadMore();
-    }
-  }
-
-  trackById(_index: number, app: MerchantApplication): string {
-    return app.id;
+  /** Skeleton slots are keyed by position, so a row is recreated once its page arrives. */
+  trackRow(index: number, app: MerchantApplication | null): string | number {
+    return app?.id ?? index;
   }
 
   createDraft(): void {

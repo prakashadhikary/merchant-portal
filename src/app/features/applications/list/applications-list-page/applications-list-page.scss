@@ -70,8 +70,12 @@ $columns-admin: minmax(11rem, 2fr) 8.5rem minmax(8rem, 1fr) minmax(9rem, 1.2fr) 
   }
 }
 
-.mp-grid-viewport {
-  height: clamp(320px, 60vh, 640px);
+// Pinned to the bottom of the window so the loaded count and the loading or
+// error state stay visible while the page scrolls through the rows.
+.mp-list-footer {
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
 }
 
 @media (max-width: 767.98px) {

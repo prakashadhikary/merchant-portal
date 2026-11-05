@@ -64,22 +64,28 @@
             <mp-icon name="alert" [size]="16" />
             Couldn't load applications: {{ message }}
           </span>
-          <button type="button" class="btn btn-outline-danger btn-sm" (click)="store.loadMore()">
+          <button type="button" class="btn btn-outline-danger btn-sm" (click)="store.retry()">
             <mp-icon name="refresh" [size]="14" />
             Retry
           </button>
         </div>
       </div>
     } @else {
-      <div class="px-3" aria-busy="true">
-        @for (row of skeletonRows; track row) {
-          <div class="placeholder-glow py-3 border-bottom">
-            <span class="placeholder col-3 me-3"></span>
-            <span class="placeholder col-2 me-3"></span>
-            <span class="placeholder col-2 me-3"></span>
-            <span class="placeholder col-1"></span>
-          </div>
-        }
+      <div
+        class="mp-grid"
+        role="table"
+        aria-label="Merchant applications"
+        aria-busy="true"
+        [class.mp-grid-admin]="isAdmin()"
+      >
+        <ng-container *ngTemplateOutlet="gridHead" />
+        <div role="rowgroup">
+          @for (row of skeletonRows; track row) {
+            <div class="mp-grid-row" role="row">
+              <ng-container *ngTemplateOutlet="skeletonCells" />
+            </div>
+          }
+        </div>
       </div>
     }
   } @else if (state.total === 0) {
@@ -109,97 +115,131 @@
       [attr.aria-rowcount]="state.total"
       [class.mp-grid-admin]="isAdmin()"
     >
-      <div class="mp-grid-head" role="rowgroup">
-        <div class="mp-grid-row mp-grid-row-head" role="row">
-          <span role="columnheader">Business</span>
-          <span role="columnheader" class="mp-col-status">Status</span>
-          <span role="columnheader" class="mp-col-volume text-end">Monthly volume</span>
-          <span role="columnheader" class="mp-col-reviewer">Reviewer</span>
-          @if (isAdmin()) {
-            <span role="columnheader" class="mp-col-creator">Created by</span>
-          }
-          <span role="columnheader" class="mp-col-updated">Updated</span>
-          <span role="columnheader" class="mp-col-action">
-            <span class="visually-hidden">Action</span>
-          </span>
-        </div>
-      </div>
-      <!-- Only the rows in and around the viewport exist in the DOM, whatever the list length. -->
+      <ng-container *ngTemplateOutlet="gridHead" />
+      <!-- Scrolls with the page; only the rows in and around the window exist in the DOM. -->
       <cdk-virtual-scroll-viewport
-        class="mp-grid-viewport"
+        scrollWindow
         role="rowgroup"
         [itemSize]="rowHeight"
         [minBufferPx]="rowHeight * 4"
         [maxBufferPx]="rowHeight * 8"
-        (scrolledIndexChange)="onScrolled()"
       >
         <div
           class="mp-grid-row"
           role="row"
-          *cdkVirtualFor="let app of state.items; trackBy: trackById; let i = index"
+          *cdkVirtualFor="let app of state.rows; trackBy: trackRow; let i = index"
           [attr.aria-rowindex]="i + 1"
+          [attr.aria-busy]="app ? null : true"
         >
-          <span role="cell" class="mp-col-business">
-            <span class="d-block fw-medium text-truncate">
-              {{ app.business.legalName || 'Untitled draft' }}
-            </span>
-            <span class="d-block small text-secondary">{{ app.id }}</span>
-          </span>
-          <span role="cell" class="mp-col-status"><mp-status-badge [status]="app.status" /></span>
-          <span role="cell" class="mp-col-volume text-end mp-tabular">
-            @if (app.contacts.expectedMonthlyVolume; as volume) {
-              NPR {{ volume | number: '1.0-0' }}
-            } @else {
-              <span class="text-secondary">-</span>
-            }
-          </span>
-          <span role="cell" class="mp-col-reviewer">
-            @if (app.assignedReviewer; as reviewer) {
-              <span class="d-inline-flex align-items-center gap-2 mw-100">
-                <mp-avatar [name]="reviewer.name" size="sm" />
-                <span class="text-truncate">{{ reviewer.name }}</span>
+          @if (app) {
+            <span role="cell" class="mp-col-business">
+              <span class="d-block fw-medium text-truncate">
+                {{ app.business.legalName || 'Untitled draft' }}
               </span>
-            } @else {
-              <span class="text-secondary">—</span>
+              <span class="d-block small text-secondary">{{ app.id }}</span>
+            </span>
+            <span role="cell" class="mp-col-status"><mp-status-badge [status]="app.status" /></span>
+            <span role="cell" class="mp-col-volume text-end mp-tabular">
+              @if (app.contacts.expectedMonthlyVolume; as volume) {
+                NPR {{ volume | number: '1.0-0' }}
+              } @else {
+                <span class="text-secondary">-</span>
+              }
+            </span>
+            <span role="cell" class="mp-col-reviewer">
+              @if (app.assignedReviewer; as reviewer) {
+                <span class="d-inline-flex align-items-center gap-2 mw-100">
+                  <mp-avatar [name]="reviewer.name" size="sm" />
+                  <span class="text-truncate">{{ reviewer.name }}</span>
+                </span>
+              } @else {
+                <span class="text-secondary">—</span>
+              }
+            </span>
+            @if (isAdmin()) {
+              <span role="cell" class="mp-col-creator text-truncate">{{ app.createdBy.name }}</span>
             }
-          </span>
-          @if (isAdmin()) {
-            <span role="cell" class="mp-col-creator text-truncate">{{ app.createdBy.name }}</span>
+            <span role="cell" class="mp-col-updated text-secondary">
+              <span [title]="app.updatedAt | date: 'medium'">{{
+                app.updatedAt | relativeTime
+              }}</span>
+            </span>
+            <span role="cell" class="mp-col-action text-end">
+              @let action = actionFor(app);
+              <a class="btn btn-sm btn-outline-primary" [routerLink]="action.link">
+                {{ action.label }}
+              </a>
+            </span>
+          } @else {
+            <ng-container *ngTemplateOutlet="skeletonCells" />
           }
-          <span role="cell" class="mp-col-updated text-secondary">
-            <span [title]="app.updatedAt | date: 'medium'">{{ app.updatedAt | relativeTime }}</span>
-          </span>
-          <span role="cell" class="mp-col-action text-end">
-            @let action = actionFor(app);
-            <a class="btn btn-sm btn-outline-primary" [routerLink]="action.link">
-              {{ action.label }}
-            </a>
-          </span>
         </div>
       </cdk-virtual-scroll-viewport>
     </div>
-    <div class="mp-card-footer" aria-live="polite">
+    <div class="mp-card-footer mp-list-footer" aria-live="polite">
       <span class="text-secondary small"
-        >Showing {{ state.items.length | number }} of {{ state.total | number }}</span
+        >Loaded {{ store.loadedCount() | number }} of {{ state.total | number }}</span
       >
       <span class="ms-auto small d-inline-flex align-items-center gap-2">
         @if (state.error; as message) {
-          <span class="text-danger">Couldn't load more: {{ message }}</span>
-          <button type="button" class="btn btn-outline-danger btn-sm" (click)="store.loadMore()">
+          <span class="text-danger">Couldn't load some rows: {{ message }}</span>
+          <button type="button" class="btn btn-outline-danger btn-sm" (click)="store.retry()">
             <mp-icon name="refresh" [size]="14" />
             Retry
           </button>
-        } @else if (state.loading) {
+        } @else if (store.loading()) {
           <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
-          <span class="text-secondary">Loading more…</span>
-        } @else if (store.hasMore()) {
-          <button type="button" class="btn btn-link btn-sm p-0" (click)="store.loadMore()">
-            Load more
-          </button>
-        } @else {
+          <span class="text-secondary">Loading…</span>
+        } @else if (store.loadedCount() === state.total) {
           <span class="text-secondary">All applications loaded</span>
         }
       </span>
     </div>
   }
 </section>
+
+<!-- Shared by the first-load skeleton and the loaded grid so their columns always match. -->
+<ng-template #gridHead>
+  <div class="mp-grid-head" role="rowgroup">
+    <div class="mp-grid-row mp-grid-row-head" role="row">
+      <span role="columnheader">Business</span>
+      <span role="columnheader" class="mp-col-status">Status</span>
+      <span role="columnheader" class="mp-col-volume text-end">Monthly volume</span>
+      <span role="columnheader" class="mp-col-reviewer">Reviewer</span>
+      @if (isAdmin()) {
+        <span role="columnheader" class="mp-col-creator">Created by</span>
+      }
+      <span role="columnheader" class="mp-col-updated">Updated</span>
+      <span role="columnheader" class="mp-col-action">
+        <span class="visually-hidden">Action</span>
+      </span>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #skeletonCells>
+  <span role="cell" class="mp-col-business placeholder-glow">
+    <span class="placeholder col-8 d-block mb-1"></span>
+    <span class="placeholder placeholder-xs col-4"></span>
+  </span>
+  <span role="cell" class="mp-col-status placeholder-glow">
+    <span class="placeholder col-10"></span>
+  </span>
+  <span role="cell" class="mp-col-volume placeholder-glow text-end">
+    <span class="placeholder col-8"></span>
+  </span>
+  <span role="cell" class="mp-col-reviewer placeholder-glow">
+    <span class="placeholder col-9"></span>
+  </span>
+  @if (isAdmin()) {
+    <span role="cell" class="mp-col-creator placeholder-glow">
+      <span class="placeholder col-8"></span>
+    </span>
+  }
+  <span role="cell" class="mp-col-updated placeholder-glow">
+    <span class="placeholder col-10"></span>
+  </span>
+  <span role="cell" class="mp-col-action placeholder-glow text-end">
+    <span class="placeholder col-10"></span>
+  </span>
+</ng-template>
