@@ -25,6 +25,17 @@ export const guestGuard: CanActivateFn = () => {
   return router.createUrlTree(['/applications']);
 };
 
+/**
+ * Ends the session from inside a navigation so the page being left runs its
+ * canDeactivate guards first (Angular runs them before canActivate). Logging
+ * out before navigating would skip the unsaved-changes prompt, because that
+ * guard lets a signed-out user leave freely.
+ */
+export const signOutGuard: CanActivateFn = () => {
+  inject(AuthService).logout();
+  return inject(Router).createUrlTree(['/login']);
+};
+
 export function roleGuard(...roles: Role[]): CanActivateFn {
   return () => {
     const authService = inject(AuthService);

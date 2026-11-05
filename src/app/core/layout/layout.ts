@@ -17,8 +17,8 @@ export class Layout {
   readonly devMode = isDevMode();
   readonly roleLabels = ROLE_LABELS;
 
-  signOut(): void {
-    this.auth.logout();
-    void this.router.navigateByUrl('/login');
+  /** The /logout route ends the session; see signOutGuard for why the layout does not. */
+  signOut(): Promise<boolean> {
+    return this.router.navigateByUrl('/logout');
   }
 }
