@@ -127,4 +127,31 @@ describe('ApplicationsListPage', () => {
     expect(req.request.params.get('page')).toBe('1');
     req.flush(makePage([]));
   });
+
+  it('filters again when the same term is typed after the filters were cleared', () => {
+    vi.useFakeTimers();
+    render('ADMIN');
+    expectList().flush(makePage([]));
+    fixture.detectChanges();
+    const input = (fixture.nativeElement as HTMLElement).querySelector<HTMLInputElement>('#search');
+    if (!input) throw new Error('search input missing');
+
+    input.value = 'tea';
+    input.dispatchEvent(new Event('input'));
+    vi.advanceTimersByTime(SEARCH_DEBOUNCE_MS);
+    fixture.detectChanges();
+    expectList().flush(makePage([]));
+
+    fixture.componentInstance.clearFilters();
+    fixture.detectChanges();
+    expectList().flush(makePage([]));
+
+    input.value = 'tea';
+    input.dispatchEvent(new Event('input'));
+    vi.advanceTimersByTime(SEARCH_DEBOUNCE_MS);
+    fixture.detectChanges();
+    const req = expectList();
+    expect(req.request.params.get('q')).toBe('tea');
+    req.flush(makePage([]));
+  });
 });

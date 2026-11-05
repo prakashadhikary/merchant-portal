@@ -3,7 +3,7 @@ import { DatePipe, DecimalPipe } from '@angular/common';
 import { Component, computed, inject, signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, RouterLink } from '@angular/router';
-import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
+import { debounceTime, filter, Subject } from 'rxjs';
 import { AuthService } from '../../../../core/auth/services/auth.service';
 import { errorMessage } from '../../../../core/http/helpers/api-error';
 import { Avatar } from '../../../../shared/components/avatar/avatar';
@@ -74,8 +74,14 @@ export class ApplicationsListPage {
   });
 
   constructor() {
+    // Compare with the store rather than the previous emission, because
+    // clearFilters() resets q without going through search$.
     this.search$
-      .pipe(debounceTime(SEARCH_DEBOUNCE_MS), distinctUntilChanged(), takeUntilDestroyed())
+      .pipe(
+        debounceTime(SEARCH_DEBOUNCE_MS),
+        filter((q) => q !== this.store.filters().q),
+        takeUntilDestroyed(),
+      )
       .subscribe((q) => this.store.setFilters({ q }));
   }
 
