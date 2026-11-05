@@ -1,0 +1,76 @@
+<div
+  class="mp-grid"
+  role="table"
+  aria-label="Merchant applications"
+  [attr.aria-rowcount]="total()"
+  [class.mp-grid-admin]="showCreator()"
+>
+  <div class="mp-grid-head" role="rowgroup">
+    <div class="mp-grid-row mp-grid-row-head" role="row">
+      <span role="columnheader">Business</span>
+      <span role="columnheader" class="mp-col-status">Status</span>
+      <span role="columnheader" class="mp-col-volume text-end">Monthly volume</span>
+      <span role="columnheader" class="mp-col-reviewer">Reviewer</span>
+      @if (showCreator()) {
+        <span role="columnheader" class="mp-col-creator">Created by</span>
+      }
+      <span role="columnheader" class="mp-col-updated">Updated</span>
+      <span role="columnheader" class="mp-col-action">
+        <span class="visually-hidden">Action</span>
+      </span>
+    </div>
+  </div>
+  <!-- Only the rows in and around the viewport exist in the DOM, whatever the list length. -->
+  <cdk-virtual-scroll-viewport
+    class="mp-grid-viewport"
+    role="rowgroup"
+    [itemSize]="rowHeight"
+    [minBufferPx]="rowHeight * 4"
+    [maxBufferPx]="rowHeight * 8"
+    (scrolledIndexChange)="checkNearEnd()"
+  >
+    <div
+      class="mp-grid-row"
+      role="row"
+      *cdkVirtualFor="let app of items(); trackBy: trackById; let i = index"
+      [attr.aria-rowindex]="i + 1"
+    >
+      <span role="cell" class="mp-col-business">
+        <span class="d-block fw-medium text-truncate">
+          {{ app.business.legalName || 'Untitled draft' }}
+        </span>
+        <span class="d-block small text-secondary">{{ app.id }}</span>
+      </span>
+      <span role="cell" class="mp-col-status"><mp-status-badge [status]="app.status" /></span>
+      <span role="cell" class="mp-col-volume text-end mp-tabular">
+        @if (app.contacts.expectedMonthlyVolume; as volume) {
+          NPR {{ volume | number: '1.0-0' }}
+        } @else {
+          <span class="text-secondary">-</span>
+        }
+      </span>
+      <span role="cell" class="mp-col-reviewer">
+        @if (app.assignedReviewer; as reviewer) {
+          <span class="d-inline-flex align-items-center gap-2 mw-100">
+            <mp-avatar [name]="reviewer.name" size="sm" />
+            <span class="text-truncate">{{ reviewer.name }}</span>
+          </span>
+        } @else {
+          <span class="text-secondary">—</span>
+        }
+      </span>
+      @if (showCreator()) {
+        <span role="cell" class="mp-col-creator text-truncate">{{ app.createdBy.name }}</span>
+      }
+      <span role="cell" class="mp-col-updated text-secondary">
+        <span [title]="app.updatedAt | date: 'medium'">{{ app.updatedAt | relativeTime }}</span>
+      </span>
+      <span role="cell" class="mp-col-action text-end">
+        @let action = actionFor(app);
+        <a class="btn btn-sm btn-outline-primary" [routerLink]="action.link">
+          {{ action.label }}
+        </a>
+      </span>
+    </div>
+  </cdk-virtual-scroll-viewport>
+</div>
