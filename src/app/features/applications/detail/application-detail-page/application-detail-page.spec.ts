@@ -98,6 +98,25 @@ describe('ApplicationDetailPage', () => {
     expect(text()).toContain('Tax ID revealed by Rita Shrestha');
   });
 
+  it('forgets revealed values when the route moves on to another application', () => {
+    render('REVIEWER', underReview);
+    fixture.componentInstance.reveal('taxId');
+    http
+      .expectOne(`/api/applications/${underReview.id}/reveal/taxId`)
+      .flush({ field: 'taxId', value: '123456789' });
+    http.expectOne(`/api/applications/${underReview.id}/history`).flush([makeHistoryEntry()]);
+    fixture.detectChanges();
+    expect(text()).toContain('123456789');
+
+    fixture.componentRef.setInput('id', 'APP-0002');
+    fixture.detectChanges();
+    http.expectOne('/api/applications/APP-0002').flush({ ...underReview, id: 'APP-0002' });
+    http.expectOne('/api/applications/APP-0002/history').flush([makeHistoryEntry()]);
+    fixture.detectChanges();
+    expect(text()).not.toContain('123456789');
+    expect(fixture.componentInstance.revealed()).toEqual({});
+  });
+
   it('keeps the page usable for ADMIN when the reviewer list fails to load', () => {
     render('ADMIN', underReview);
     http

@@ -1,8 +1,8 @@
 import { DecimalPipe } from '@angular/common';
 import { Component, computed, inject, input, linkedSignal, signal } from '@angular/core';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { Router, RouterLink } from '@angular/router';
-import { catchError, map, merge, Observable, of, Subject, switchMap } from 'rxjs';
+import { catchError, map, merge, Observable, of, skip, Subject, switchMap } from 'rxjs';
 import { AuthService } from '../../../../core/auth/services/auth.service';
 import { errorMessage } from '../../../../core/http/helpers/api-error';
 import { Loadable, LOADING, toLoadable } from '../../../../core/http/helpers/loadable';
@@ -119,6 +119,19 @@ export class ApplicationDetailPage {
     const app = this.loaded();
     return app?.status === 'DRAFT' && app.createdBy.id === this.auth.user()?.id;
   });
+
+  constructor() {
+    // The router reuses this instance when only :id changes, so state that
+    // belongs to one application must not carry over to the next one.
+    toObservable(this.id)
+      .pipe(skip(1), takeUntilDestroyed())
+      .subscribe(() => {
+        this.revealed.set({});
+        this.revealing.set(null);
+        this.actionError.set(null);
+        this.submitted.set(false);
+      });
+  }
 
   reloadApplication(): void {
     this.reloadApplication$.next();
