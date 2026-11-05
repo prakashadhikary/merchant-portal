@@ -52,6 +52,15 @@ describe('ApplicationFormPage', () => {
     expect(button('Save draft')).toBeUndefined();
   });
 
+  it('moves focus to the step heading when the step changes', () => {
+    render();
+    button('Next')?.click();
+    fixture.detectChanges();
+    expect(fixture.componentInstance.step()).toBe('contacts');
+    const heading = (fixture.nativeElement as HTMLElement).querySelector('h2[tabindex="-1"]');
+    expect(document.activeElement).toBe(heading);
+  });
+
   it('keeps Submit disabled until the whole form, declaration included, is valid', () => {
     render();
     fixture.componentInstance.goTo('review');

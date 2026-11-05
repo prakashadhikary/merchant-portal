@@ -88,6 +88,8 @@ export class ApplicationFormPage {
   goTo(step: ApplicationFormStep | undefined): void {
     if (!step || !this.canGoTo(step)) return;
     this.step.set(step);
+    // Focus the heading so assistive technology announces the new step.
+    this.heading()?.nativeElement.focus();
     this.store.saveNow();
   }
 
