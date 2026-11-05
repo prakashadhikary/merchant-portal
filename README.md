@@ -14,6 +14,11 @@ every request.
 
 ## Run it
 
+The `main` branch is the stable version. The
+`feat/list-window-scroll-skeletons` branch is an unfinished experiment with a
+different take on the applications list, where pages load as they scroll into
+view with skeleton rows in between. It is work in progress and can be ignored.
+
 ```bash
 npm ci
 npm start          # http://localhost:4200
