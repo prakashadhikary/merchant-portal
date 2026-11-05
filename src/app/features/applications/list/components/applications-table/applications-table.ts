@@ -12,7 +12,7 @@ import { StatusBadge } from '../../../components/status-badge/status-badge';
 import { MerchantApplication } from '../../../models/application.models';
 
 /** Fixed row height in px; the virtual scroll strategy relies on every row being this tall. */
-export const ROW_HEIGHT = 64;
+export const ROW_HEIGHT = 40;
 /**
  * How long the rendered range must hold still before `rangeChange` emits, so
  * dragging the scrollbar across the list does not request every page it
@@ -26,8 +26,8 @@ export interface RowAction {
 }
 
 /**
- * Virtualized grid of applications that scrolls with the window. A null row
- * renders as a skeleton; the table reports which rows are on screen, and
+ * Virtualized grid of applications that scrolls inside its own viewport and
+ * grows to fill the height its host gives it. A null row renders as a skeleton; the table reports which rows are on screen, and
  * fetching them is the page's job.
  */
 @Component({

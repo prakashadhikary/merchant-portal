@@ -4,8 +4,13 @@
     <p class="mp-page-subtitle">{{ subtitle() }}</p>
   </div>
   @if (auth.hasRole('SALES')) {
-    <button type="button" class="btn btn-primary" [disabled]="creating()" (click)="createDraft()">
-      <mp-icon name="plus" [size]="16" />
+    <button
+      type="button"
+      class="btn btn-primary btn-sm"
+      [disabled]="creating()"
+      (click)="createDraft()"
+    >
+      <mp-icon name="plus" [size]="14" />
       New application
     </button>
   }
@@ -15,16 +20,16 @@
   <div class="alert alert-danger" role="alert">{{ message }}</div>
 }
 
-<section class="mp-card">
+<section class="mp-card mp-list-card">
   <form class="mp-toolbar" (submit)="$event.preventDefault()">
     <div class="mp-search">
       <label class="visually-hidden" for="search">Search by business name</label>
-      <mp-icon class="mp-search-icon" name="search" [size]="16" />
+      <mp-icon class="mp-search-icon" name="search" [size]="14" />
       <input
         #searchInput
         id="search"
         type="search"
-        class="form-control"
+        class="form-control form-control-sm"
         placeholder="Search by business name"
         [value]="store.filters().q"
         (input)="search(searchInput.value)"
@@ -35,7 +40,7 @@
       <select
         #statusSelect
         id="status"
-        class="form-select"
+        class="form-select form-select-sm"
         [value]="store.filters().status"
         (change)="setStatus(statusSelect.value)"
       >
@@ -98,7 +103,7 @@
       [role]="auth.user()?.role"
       (rangeChange)="store.loadRange($event.start, $event.end)"
     />
-    <div class="mp-card-footer mp-list-footer" aria-live="polite">
+    <div class="mp-card-footer" aria-live="polite">
       <span class="text-secondary small"
         >Loaded {{ store.loadedCount() | number }} of {{ state.total | number }}</span
       >

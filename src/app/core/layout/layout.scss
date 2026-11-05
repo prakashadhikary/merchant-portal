@@ -1,4 +1,32 @@
+// A column at least as tall as the window, so a page can claim the height
+// left under the navbar (the applications list sizes its table from it).
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+
+main {
+  display: flex;
+  flex: 1 0 auto;
+  flex-direction: column;
+}
+
+// A compact bar, so pages keep as much of the window as possible.
+.navbar {
+  --bs-navbar-padding-y: 0.25rem;
+  --bs-navbar-brand-font-size: 1rem;
+  --bs-navbar-brand-padding-y: 0.25rem;
+}
+
+.mp-brand-mark {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 0.375rem;
+}
+
 .nav-link {
+  font-size: 0.875rem;
   font-weight: 500;
   color: var(--bs-secondary-color);
 
@@ -8,6 +36,6 @@
 }
 
 .mp-role {
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
   color: var(--bs-secondary-color);
 }

@@ -1,7 +1,7 @@
 <nav class="navbar navbar-expand bg-white border-bottom sticky-top" aria-label="Main">
   <div class="container">
     <a class="navbar-brand d-flex align-items-center gap-2 me-sm-4" routerLink="/applications">
-      <span class="mp-brand-mark" aria-hidden="true"><mp-icon name="check" [size]="16" /></span>
+      <span class="mp-brand-mark" aria-hidden="true"><mp-icon name="check" [size]="14" /></span>
       <span class="fw-semibold">Merchant Portal</span>
     </a>
     <div class="navbar-nav me-auto d-none d-sm-flex">
@@ -11,7 +11,7 @@
       <div class="d-flex align-items-center gap-2 ms-auto me-2 me-sm-3">
         <mp-avatar [name]="user.name" size="sm" />
         <span class="d-none d-md-block lh-sm">
-          <span class="d-block small fw-medium">{{ user.name }}</span>
+          <span class="d-block small fw-medium lh-1">{{ user.name }}</span>
           <span class="d-block mp-role">{{ roleLabels[user.role] }}</span>
         </span>
       </div>
@@ -39,6 +39,6 @@
     </button>
   </div>
 </nav>
-<main id="main" class="container py-4">
+<main id="main" class="container py-3">
   <router-outlet />
 </main>
