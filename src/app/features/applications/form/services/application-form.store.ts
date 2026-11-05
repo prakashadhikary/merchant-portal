@@ -112,6 +112,8 @@ export class ApplicationFormStore {
     return this.api.saveDraft(app.id, data).pipe(
       map((saved): SaveStatus => {
         this.lastSaved = { json, at: new Date(saved.updatedAt) };
+        // Edits typed while this request was in flight are not saved yet.
+        if (JSON.stringify(toApplicationData(this.form)) !== json) return { kind: 'dirty' };
         return { kind: 'saved', at: this.lastSaved.at };
       }),
       catchError((error: unknown) =>

@@ -132,6 +132,22 @@ describe('ApplicationFormStore auto-save', () => {
     expect(store.saveStatus().kind).toBe('saved');
   });
 
+  it('stays dirty when the user keeps typing while a save is in flight', () => {
+    edit('business.legalName', 'Everest');
+    vi.advanceTimersByTime(AUTOSAVE_DEBOUNCE_MS);
+    const put = expectPut();
+    edit('business.legalName', 'Everest Coffee');
+    put.flush(makeDraft());
+    expect(store.saveStatus().kind).toBe('dirty');
+    expect(store.hasUnsavedChanges()).toBe(true);
+
+    vi.advanceTimersByTime(AUTOSAVE_DEBOUNCE_MS);
+    const next = expectPut();
+    expect(next.request.body).toMatchObject({ business: { legalName: 'Everest Coffee' } });
+    next.flush(makeDraft());
+    expect(store.saveStatus().kind).toBe('saved');
+  });
+
   it('submit saves the current values before posting', () => {
     edit('business.legalName', 'Everest');
     let submitted = false;
