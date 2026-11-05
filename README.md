@@ -8,8 +8,9 @@ logged.
 
 Angular 22 with standalone components, signals and typed Reactive Forms. RxJS
 for async work, Angular CDK for virtual scrolling, Bootstrap 5 compiled from
-SCSS, Vitest with TestBed for tests. There is no backend: a fake API runs inside
-the browser and answers every request.
+SCSS, Vitest with TestBed for tests, and Storybook for the presentational
+components. There is no backend: a fake API runs inside the browser and answers
+every request.
 
 ## Run it
 
@@ -56,6 +57,17 @@ npm run format:check
 npm run build
 ```
 
+### Storybook
+
+Every presentational component has stories next to it, rendered with the app's
+theme and zoneless change detection. The decision panel stories also play
+through the reject flow, with and without a note.
+
+```bash
+npm run storybook         # http://localhost:6006
+npm run build-storybook   # static build to storybook-static/
+```
+
 ## How it is put together
 
 ```
@@ -71,11 +83,12 @@ src/app
 src/mocks      fake backend (router, rules, interceptor) and seed data
 src/styles     Bootstrap compiled from source with the theme tokens
 src/testing    session seeding and fixtures
+.storybook     Storybook config (Vite builder, app styles, zoneless)
 ```
 
-Each component sits in its own folder with its template and spec. Only the
-`*-page` components inject services and know about routing; everything else
-takes inputs and emits outputs.
+Each component sits in its own folder with its template, spec and, for
+presentational ones, stories. Only the `*-page` components inject services and
+know about routing; everything else takes inputs and emits outputs.
 
 A few decisions worth knowing about:
 
@@ -181,7 +194,8 @@ publishing.
 ## Tests
 
 111 specs in 20 files, run with Vitest and TestBed under zoneless change
-detection. Highlights:
+detection. CI also builds Storybook, so a story that no longer compiles fails
+the pipeline. Highlights:
 
 - The auth interceptor: three concurrent 401s produce one refresh and three
   retries with the new token.

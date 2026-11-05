@@ -97,6 +97,46 @@
           "options": {
             "lintFilePatterns": ["src/**/*.ts", "src/**/*.html"]
           }
+        },
+        "storybook": {
+          "builder": "@storybook/angular-vite:start-storybook",
+          "options": {
+            "configDir": ".storybook",
+            "browserTarget": "merchant-portal:build:development",
+            "tsConfig": ".storybook/tsconfig.json",
+            "styles": ["src/styles/styles.scss"],
+            "stylePreprocessorOptions": {
+              "sass": {
+                "silenceDeprecations": [
+                  "import",
+                  "if-function",
+                  "global-builtin",
+                  "color-functions"
+                ]
+              }
+            },
+            "port": 6006
+          }
+        },
+        "build-storybook": {
+          "builder": "@storybook/angular-vite:build-storybook",
+          "options": {
+            "configDir": ".storybook",
+            "browserTarget": "merchant-portal:build:development",
+            "tsConfig": ".storybook/tsconfig.json",
+            "styles": ["src/styles/styles.scss"],
+            "stylePreprocessorOptions": {
+              "sass": {
+                "silenceDeprecations": [
+                  "import",
+                  "if-function",
+                  "global-builtin",
+                  "color-functions"
+                ]
+              }
+            },
+            "outputDir": "storybook-static"
+          }
         }
       }
     }

@@ -9,7 +9,9 @@
     "test": "ng test",
     "lint": "ng lint",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "storybook": "ng run merchant-portal:storybook",
+    "build-storybook": "ng run merchant-portal:build-storybook"
   },
   "private": true,
   "packageManager": "npm@11.12.1",
@@ -26,16 +28,25 @@
     "tslib": "^2.3.0"
   },
   "devDependencies": {
+    "@analogjs/vite-plugin-angular": "^2.9.6",
+    "@angular-devkit/architect": "^0.2202.0",
+    "@angular-devkit/core": "^22.2.0",
+    "@angular/animations": "^22.2.0",
     "@angular/build": "^22.2.5",
     "@angular/cli": "^22.2.5",
     "@angular/compiler-cli": "^22.2.0",
     "@eslint/js": "^10.0.1",
+    "@storybook/addon-docs": "^10.6.5",
+    "@storybook/angular-vite": "^10.6.5",
+    "@types/node": "^24.0.0",
     "angular-eslint": "22.6.0",
     "eslint": "^10.12.0",
     "jsdom": "^30.0.0",
     "prettier": "^3.9.10",
+    "storybook": "^10.6.5",
     "typescript": "~6.0.2",
     "typescript-eslint": "8.71.0",
+    "vite": "^8.3.5",
     "vitest": "^5.0.0"
   },
   "engines": {
