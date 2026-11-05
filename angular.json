@@ -7,7 +7,7 @@
   },
   "newProjectRoot": "projects",
   "projects": {
-    "merchant-portal-lite": {
+    "merchant-portal": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -78,10 +78,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "merchant-portal-lite:build:production"
+              "buildTarget": "merchant-portal:build:production"
             },
             "development": {
-              "buildTarget": "merchant-portal-lite:build:development"
+              "buildTarget": "merchant-portal:build:development"
             }
           },
           "defaultConfiguration": "development"

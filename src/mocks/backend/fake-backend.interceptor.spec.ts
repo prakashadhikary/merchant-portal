@@ -27,12 +27,12 @@ describe('fakeBackendInterceptor', () => {
 
   it('answers reads without touching storage', async () => {
     await firstValueFrom(http.get('/api/applications', { headers }));
-    expect(localStorage.getItem('merchant-portal-lite.db')).toBeNull();
+    expect(localStorage.getItem('merchant-portal.db')).toBeNull();
   });
 
   it('persists after a request that changed data', async () => {
     await firstValueFrom(http.post('/api/applications', {}, { headers }));
-    expect(localStorage.getItem('merchant-portal-lite.db')).toContain('APP-0041');
+    expect(localStorage.getItem('merchant-portal.db')).toContain('APP-0041');
   });
 
   it('lets requests outside /api pass through to the real backend', () => {

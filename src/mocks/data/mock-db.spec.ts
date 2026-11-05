@@ -8,7 +8,7 @@ describe('mock db persistence', () => {
     const db = loadDb();
     expect(db.applications).toHaveLength(DEFAULT_SEED_SIZE);
     expect(saveDb(db)).toBe(true);
-    expect(localStorage.getItem('merchant-portal-lite.db')).not.toBeNull();
+    expect(localStorage.getItem('merchant-portal.db')).not.toBeNull();
   });
 
   it('regenerates with the size chosen at reset', () => {
@@ -26,6 +26,6 @@ describe('mock db persistence', () => {
     expect(saveDb(db)).toBe(false);
     expect(setItem).toHaveBeenCalledTimes(1);
     setItem.mockRestore();
-    expect(localStorage.getItem('merchant-portal-lite.db')).toBeNull();
+    expect(localStorage.getItem('merchant-portal.db')).toBeNull();
   });
 });

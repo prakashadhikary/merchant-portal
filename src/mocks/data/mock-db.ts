@@ -6,8 +6,8 @@ import { DEFAULT_SEED_SIZE, MockDb, SEED_SIZES, seedDb } from './mock-data';
  * the data stays in memory for the session and the chosen size is regenerated
  * deterministically on the next load.
  */
-const DB_KEY = 'merchant-portal-lite.db';
-const SIZE_KEY = 'merchant-portal-lite.seed-size';
+const DB_KEY = 'merchant-portal.db';
+const SIZE_KEY = 'merchant-portal.seed-size';
 let memo: MockDb | null = null;
 let storageUsable = true;
 

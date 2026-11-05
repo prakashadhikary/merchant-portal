@@ -12,7 +12,7 @@ export interface AuthSession {
 }
 
 /** sessionStorage is tab-scoped, so a session does not outlive the tab. */
-export const SESSION_STORAGE_KEY = 'merchant-portal-lite.session';
+export const SESSION_STORAGE_KEY = 'merchant-portal.session';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
